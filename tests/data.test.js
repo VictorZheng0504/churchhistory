@@ -71,8 +71,9 @@ for (const L of lessons) {
     await t.test('地点坐标', () => {
       for (const p of L.places) {
         assert.ok(p.id && p.name, '地点缺 id/name');
-        assert.ok(p.lat > 20 && p.lat < 70, `${p.id} 纬度可疑: ${p.lat}`);
-        assert.ok(p.lon > -80 && p.lon < 40, `${p.id} 经度可疑: ${p.lon}`);
+        // 范围与 tools/build-map.mjs 的世界视图一致；超出的地点画不出来
+        assert.ok(p.lat > -40 && p.lat < 66, `${p.id} 纬度超出地图: ${p.lat}`);
+        assert.ok(p.lon > -130 && p.lon < 150, `${p.id} 经度超出地图: ${p.lon}`);
       }
     });
 

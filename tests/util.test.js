@@ -39,7 +39,22 @@ test('mainView 地点都在欧洲图内才用欧洲图', () => {
   const V = { europe: { lon0: -11, lon1: 26, lat0: 40, lat1: 58.5 }, newEngland: { lon0: -74, lon1: -69, lat0: 40, lat1: 43 } };
   const wittenberg = { lon: 12.6, lat: 51.9 }, boston = { lon: -71, lat: 42.4 }, jerusalem = { lon: 35.2, lat: 31.8 };
   assert.strictEqual(U.mainView(V, [wittenberg, boston]), 'europe');
-  assert.strictEqual(U.mainView(V, [wittenberg, jerusalem]), 'mediterranean');
+  assert.strictEqual(U.mainView(V, [wittenberg, jerusalem]), 'world', '缺少的视图跳过，最后兜底 world');
+});
+
+test('mainView 从小到大选第一张装得下的图', () => {
+  const V = {
+    europe: { lon0: -11, lon1: 30, lat0: 40, lat1: 58.5 }, mediterranean: { lon0: -11, lon1: 50, lat0: 20, lat1: 56 },
+    usa: { lon0: -125, lon1: -66, lat0: 24, lat1: 50 }, atlantic: { lon0: -100, lon1: 35, lat0: 22, lat1: 62 },
+    world: { lon0: -130, lon1: 150, lat0: -40, lat1: 66 }, newEngland: { lon0: -74.2, lon1: -69.6, lat0: 40.8, lat1: 43.2 },
+  };
+  const london = { lon: -0.13, lat: 51.5 }, boston = { lon: -71.06, lat: 42.36 }, jerusalem = { lon: 35.2, lat: 31.8 };
+  const dc = { lon: -77.0, lat: 38.9 }, serampore = { lon: 88.34, lat: 22.75 };
+  assert.strictEqual(U.mainView(V, [london, boston]), 'europe', '波士顿进新英格兰小图');
+  assert.strictEqual(U.mainView(V, [london, jerusalem, boston]), 'mediterranean');
+  assert.strictEqual(U.mainView(V, [dc, boston]), 'usa');
+  assert.strictEqual(U.mainView(V, [london, dc]), 'atlantic', '美国大图不配新英格兰小图，伦敦得进主图');
+  assert.strictEqual(U.mainView(V, [london, serampore]), 'world');
 });
 
 test('assignLanes 不重叠', () => {

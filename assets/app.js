@@ -51,10 +51,18 @@
       f.lo = lo; f.hi = hi; f.weight = cum[n];
       return f;
     },
-    // 选主地图：地点都在"改革时代欧洲"里就用它（城市不挤），否则用地中海大图。新英格兰另有小图。
+    // 选主地图：从小到大，取第一张装得下所有地点的图（城市越不挤越好）。
+    // 欧洲/地中海图另配新英格兰小图，所以新英格兰的地点不算在内。
+    MAIN_VIEWS: ['europe', 'mediterranean', 'usa', 'atlantic', 'world'],
+    INSET_OK: ['europe', 'mediterranean'],
     mainView(views, places) {
-      const rest = places.filter(p => !(views.newEngland && Util.inView(views.newEngland, p.lon, p.lat)));
-      return rest.every(p => Util.inView(views.europe, p.lon, p.lat)) ? 'europe' : 'mediterranean';
+      const inNE = p => views.newEngland && Util.inView(views.newEngland, p.lon, p.lat);
+      for (const k of Util.MAIN_VIEWS) {
+        if (!views[k]) continue;
+        const need = Util.INSET_OK.includes(k) ? places.filter(p => !inNE(p)) : places;
+        if (need.every(p => Util.inView(views[k], p.lon, p.lat))) return k;
+      }
+      return 'world';
     },
     // 把条目分配到不重叠的"泳道"；返回每个条目的泳道号
     assignLanes(xs, widths, maxLanes) {
@@ -335,7 +343,8 @@
     const f = $('.tl-filters', wrap), host = $('.map-host', wrap);
     const groups = [
       { label: '第 1–5 课 · 早期与中世纪', ls: lessons.filter(L => L.no <= 5) },
-      { label: '第 6–9 课 · 宗教改革', ls: lessons.filter(L => L.no >= 6) },
+      { label: '第 6–9 课 · 宗教改革', ls: lessons.filter(L => L.no >= 6 && L.no <= 9) },
+      { label: '第 10–13 课 · 觉醒与宣教', ls: lessons.filter(L => L.no >= 10) },
     ].filter(g => g.ls.length);
     const opts = groups.concat(lessons.map(L => ({ label: `第 ${L.no} 课`, ls: [L] })));
     const chips = opts.map(o => {
@@ -359,7 +368,8 @@
     const mw = $('.map-wrap', wrap);
     const main = Util.mainView(MAP, places);
     const views = { [main]: MAP[main], newEngland: MAP.newEngland };
-    const where = p => Util.inView(views[main], p.lon, p.lat) ? main : (Util.inView(views.newEngland, p.lon, p.lat) ? 'newEngland' : null);
+    const insetOK = Util.INSET_OK.includes(main);
+    const where = p => Util.inView(views[main], p.lon, p.lat) ? main : (insetOK && Util.inView(views.newEngland, p.lon, p.lat) ? 'newEngland' : null);
     const svgs = {};
     const needInset = places.some(p => where(p) === 'newEngland');
 
@@ -368,11 +378,13 @@
       const V = views[key];
       let grid = '';
       if (key === main) {
-        const step = main === 'europe' ? 5 : 10;
-        for (let lon = Math.ceil(V.lon0 / step) * step; lon <= V.lon1; lon += step) { const [x] = Util.project(V, lon, 0); grid += `<path class="map-grid" d="M${x.toFixed(1)},0V${V.height}"/><text class="map-grid-lbl" x="${x + 3}" y="${V.height - 6}">${Math.abs(lon)}°${lon < 0 ? 'W' : 'E'}</text>`; }
-        for (let lat = Math.ceil(V.lat0 / 5) * 5 + 5; lat < V.lat1; lat += 5) { const [, y] = Util.project(V, 0, lat); grid += `<path class="map-grid" d="M0,${y.toFixed(1)}H${V.width}"/><text class="map-grid-lbl" x="${V.width - 34}" y="${y - 4}">${lat}°N</text>`; }
+        // 经纬线间隔随地图范围放大，保持每张图大约 5–10 条
+        const [step, latStep] = { europe: [5, 5], mediterranean: [10, 5], usa: [10, 10], atlantic: [20, 10], world: [30, 20] }[main];
+        const hemi = (n, pos, neg) => `${Math.abs(n)}°${n < 0 ? neg : pos}`;
+        for (let lon = Math.ceil(V.lon0 / step) * step; lon <= V.lon1; lon += step) { const [x] = Util.project(V, lon, 0); grid += `<path class="map-grid" d="M${x.toFixed(1)},0V${V.height}"/><text class="map-grid-lbl" x="${x + 3}" y="${V.height - 6}">${hemi(lon, 'E', 'W')}</text>`; }
+        for (let lat = Math.floor(V.lat0 / latStep) * latStep + latStep; lat < V.lat1; lat += latStep) { const [, y] = Util.project(V, 0, lat); grid += `<path class="map-grid" d="M0,${y.toFixed(1)}H${V.width}"/><text class="map-grid-lbl" x="${V.width - 34}" y="${y - 4}">${hemi(lat, 'N', 'S')}</text>`; }
       }
-      const label = { europe: '欧洲地图', mediterranean: '地中海世界地图', newEngland: '新英格兰地图' }[key];
+      const label = { europe: '欧洲地图', mediterranean: '地中海世界地图', usa: '北美地图', atlantic: '大西洋两岸地图', world: '世界地图', newEngland: '新英格兰地图' }[key];
       const svg = el(`<svg viewBox="0 0 ${V.width} ${V.height}" role="img" aria-label="${label}"><path class="map-land" d="${V.path}"/>${grid}<g class="jr"></g><g class="pts"></g></svg>`);
       svgs[key] = svg;
       if (key === main) mw.appendChild(svg);
