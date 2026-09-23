@@ -26,7 +26,8 @@
       years: '约 1500',                 // 可选，字符串
       body: ['段落1', '段落2'],          // 每段 60–180 字
       highlight: { type: 'quote' | 'fact' | 'note', text: '…', source: '…' },  // 可选
-      activity: 'indulgence'            // 可选：在本章后插入的 activity id
+      activity: 'indulgence',           // 可选：在本章后插入的 activity id
+      notes: ['另有资料作……']            // 可选：讲义与通行史料不一致时的小字批注（正文照讲义写）
     }
   ],
 

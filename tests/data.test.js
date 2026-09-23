@@ -63,6 +63,7 @@ for (const L of lessons) {
         assert.ok(c.title, `章节 ${c.id} 缺标题`);
         assert.ok(Array.isArray(c.body) && c.body.length > 0, `章节 ${c.id} 没有正文`);
         for (const p of c.body) assert.strictEqual(typeof p, 'string');
+        if (c.notes !== undefined) assert.ok(Array.isArray(c.notes) && c.notes.every(n => typeof n === 'string' && n), `章节 ${c.id} 的 notes 须为非空字符串数组`);
       }
     });
 

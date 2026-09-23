@@ -503,3 +503,7 @@ footer.site { max-width: 72rem; margin: 0 auto; padding: 2rem 16px 3rem; font-fa
 .popover { position: absolute; z-index: 30; background: var(--card); border: 1px solid var(--ink); border-radius: var(--radius); padding: .8rem 1rem; box-shadow: var(--shadow); font-size: var(--fs-1); animation: fadein .2s both; }
 .popover p { margin-top: .3rem; color: var(--ink-2); }
 code { font-size: .9em; background: var(--paper-2); padding: 0 .3em; border-radius: 3px; }
+
+/* 讲义与其他史料不一致时的小字批注：正文照讲义，这里给另一种说法 */
+.src-note { margin-top: .9rem; font-family: var(--f-sans); font-size: var(--fs-0); color: var(--muted); line-height: 1.6; padding-left: .8rem; border-left: 2px solid var(--line); }
+.src-note .tag { color: var(--accent); margin-right: .4rem; letter-spacing: .08em; }
