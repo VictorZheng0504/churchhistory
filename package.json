@@ -1,0 +1,17 @@
+{
+  "name": "churchhistory",
+  "version": "1.0.0",
+  "private": true,
+  "description": "教会史互动课堂：宗教改革与清教徒（第 6–9 课）",
+  "scripts": {
+    "test": "node --test",
+    "test:e2e": "node tests/smoke.mjs",
+    "serve": "npx --yes http-server -p 8080 -c-1 .",
+    "build:map": "node tools/build-map.mjs"
+  },
+  "devDependencies": {
+    "d3-geo": "^3.1.1",
+    "topojson-client": "^3.1.0",
+    "world-atlas": "^2.0.2"
+  }
+}
