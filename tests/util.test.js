@@ -45,7 +45,7 @@ test('mainView 地点都在欧洲图内才用欧洲图', () => {
 test('mainView 从小到大选第一张装得下的图', () => {
   const V = {
     europe: { lon0: -11, lon1: 30, lat0: 40, lat1: 58.5 }, mediterranean: { lon0: -11, lon1: 50, lat0: 20, lat1: 56 },
-    usa: { lon0: -125, lon1: -66, lat0: 24, lat1: 50 }, atlantic: { lon0: -100, lon1: 35, lat0: 22, lat1: 62 },
+    usa: { lon0: -125, lon1: -66, lat0: 24, lat1: 50 }, atlantic: { lon0: -125, lon1: 35, lat0: 22, lat1: 62 },
     world: { lon0: -130, lon1: 150, lat0: -40, lat1: 66 }, newEngland: { lon0: -74.2, lon1: -69.6, lat0: 40.8, lat1: 43.2 },
   };
   const london = { lon: -0.13, lat: 51.5 }, boston = { lon: -71.06, lat: 42.36 }, jerusalem = { lon: 35.2, lat: 31.8 };

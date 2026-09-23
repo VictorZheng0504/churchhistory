@@ -43,8 +43,8 @@ const data = {
   newEngland: makeView({ lon0: -74.2, lon1: -69.6, lat0: 40.8, lat1: 43.2, width: 300 }),
   // 北美（第 10、13 课）：殖民地到美国本土
   usa: makeView({ lon0: -125, lon1: -66, lat0: 24, lat1: 50, width: 1000, land: land110 }),
-  // 大西洋两岸（大觉醒、浸信会起源）：英国 + 北美东岸
-  atlantic: makeView({ lon0: -100, lon1: 35, lat0: 22, lat1: 62, width: 1000, land: land110 }),
+  // 大西洋两岸（大觉醒、浸信会起源、20 世纪）：英国 + 北美
+  atlantic: makeView({ lon0: -125, lon1: 35, lat0: 22, lat1: 62, width: 1000, land: land110 }),
   // 世界（宣教运动）：印度、缅甸、中国
   world: makeView({ lon0: -130, lon1: 150, lat0: -40, lat1: 66, width: 1000, land: land110 }),
 };

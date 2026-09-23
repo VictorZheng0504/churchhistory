@@ -120,7 +120,7 @@
   const el = html => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
   const accentStyle = L => `--accent-raw:${esc(L.accent)}`;
   const SITE = '从耶路撒冷到山上之城';
-  const CN_NUM = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
+  const CN_NUM = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十', '十一', '十二', '十三', '十四', '十五'];
 
   // localStorage 可能不可用（隐私模式等），全部包 try
   const store = {
@@ -772,7 +772,9 @@
 
     /* 旅程：地图上一站一站走 */
     journey(body, a, done, ctx) {
-      const places = Util.mergePlaces(LESSONS);
+      // 站点可以引用别课的地点，所以从全部课里找；但只画沿途各站，地图才会缩放到这段旅程
+      const ids = new Set(a.stops.map(s => s.place));
+      const places = Util.mergePlaces(LESSONS).filter(p => ids.has(p.id));
       const m = mapView({ places, lessons: [ctx.L], journey: a });
       body.appendChild(m);
       const stops = m.stops || [];
