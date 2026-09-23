@@ -436,7 +436,7 @@
       explain: '一词之差影响重大：信徒从此明白，基督赦免的是“悔改信靠”的人，而不是靠做补赎行为抵罪的人。'
     },
     {
-      q: '讲稿用什么比喻说明沃尔西的权力有多大？',
+      q: '本课用什么比喻说明沃尔西的权力有多大？',
       options: ['像一位只管教会的教皇', '像同一个人既是副元首、又是枢机主教、还兼任我们教会的主任牧师', '像一位普通的地方主教', '像一位没有实权的顾问'],
       answer: 1,
       explain: '沃尔西同时是约克大主教、枢机主教兼教皇特使和王国大法官，“一个人就集英格兰教会、罗马教会和英格兰王国于一身”。'
@@ -492,7 +492,7 @@
     { title: 'William Tyndale: A Biography', author: 'David Daniell', note: '讲义推荐：精彩的丁道尔传记。' },
     { title: 'The Unquenchable Flame（中译《不灭的火焰》）', author: 'Michael Reeves', note: '讲义推荐：宗教改革最好的简明入门书。' },
     { title: '丁道尔为新约各卷写的序言', author: 'William Tyndale', note: '讲义推荐：认识丁道尔本人著作的好入口。' },
-    { title: 'Five English Reformers（《五位英国改教家》）', author: 'J. C. Ryle', note: '讲稿多处引用：胡珀、拉蒂默、雷德利、克兰麦等人的生平与殉道。' }
+    { title: 'Five English Reformers（《五位英国改教家》）', author: 'J. C. Ryle', note: '本课多处引用：胡珀、拉蒂默、雷德利、克兰麦等人的生平与殉道。' }
   ],
 
   meta: {}

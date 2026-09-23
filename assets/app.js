@@ -33,11 +33,28 @@
     inView(view, lon, lat) {
       return lon >= view.lon0 && lon <= view.lon1 && lat >= view.lat0 && lat <= view.lat1;
     },
-    // 时间轴：中世纪（1100–1480）压缩到前 16%，改革时代展开
-    timeX(year, width, pad = 40) {
-      const brk = 1480, a = 1100, b = 1720, split = pad + (width - 2 * pad) * 0.16;
-      if (year <= brk) return pad + (Math.max(year, a) - a) / (brk - a) * (split - pad);
-      return split + (Math.min(year, b) - brk) / (b - brk) * (width - pad - split);
+    // 时间轴比例尺：每 25 年一格，格宽 = 事件数 + 0.35。
+    // 事件密的年代（1520–1560）自动展开，空白的几百年只占一点位置但仍看得出"很长"。
+    timeScale(years, width, pad = 40, bucket = 25) {
+      const lo = Math.floor(Math.min(...years) / bucket) * bucket;
+      const hi = (Math.floor(Math.max(...years) / bucket) + 1) * bucket;
+      const n = (hi - lo) / bucket;
+      const w = Array(n).fill(0.35);
+      for (const y of years) w[Math.min(n - 1, Math.floor((y - lo) / bucket))] += 1;
+      const cum = [0];
+      for (const x of w) cum.push(cum[cum.length - 1] + x);
+      const f = y => {
+        const t = Math.max(lo, Math.min(hi, y));
+        const i = Math.min(n - 1, Math.floor((t - lo) / bucket));
+        return pad + (cum[i] + w[i] * (t - lo - i * bucket) / bucket) / cum[n] * (width - 2 * pad);
+      };
+      f.lo = lo; f.hi = hi; f.weight = cum[n];
+      return f;
+    },
+    // 选主地图：地点都在"改革时代欧洲"里就用它（城市不挤），否则用地中海大图。新英格兰另有小图。
+    mainView(views, places) {
+      const rest = places.filter(p => !(views.newEngland && Util.inView(views.newEngland, p.lon, p.lat)));
+      return rest.every(p => Util.inView(views.europe, p.lon, p.lat)) ? 'europe' : 'mediterranean';
     },
     // 把条目分配到不重叠的"泳道"；返回每个条目的泳道号
     assignLanes(xs, widths, maxLanes) {
@@ -94,6 +111,7 @@
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const el = html => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
   const accentStyle = L => `--accent-raw:${esc(L.accent)}`;
+  const SITE = '从耶路撒冷到山上之城';
   const CN_NUM = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九', '十'];
 
   // localStorage 可能不可用（隐私模式等），全部包 try
@@ -112,7 +130,7 @@
     const bar = $('#topbar');
     bar.innerHTML = `
       <div class="topbar-in">
-        <a class="brand" href="#"><span class="lat">R</span> <span class="full">从维滕堡到山上之城</span></a>
+        <a class="brand" href="#"><span class="lat">H</span> <span class="full">${SITE}</span></a>
         <nav class="nav" aria-label="课程导航">
           ${LESSONS.map(L => `<a href="#${esc(L.id)}" data-route="${esc(L.id)}">第${CN_NUM[L.no] || L.no}课</a>`).join('')}
           <a href="#review" data-route="review">复习</a>
@@ -148,9 +166,9 @@
     const id = decodeURIComponent(location.hash.slice(1));
     const main = $('#main');
     main.innerHTML = '';
-    if (byId(id)) { renderLesson(main, byId(id)); store.set('last', id); document.title = byId(id).title + ' · 从维滕堡到山上之城'; }
-    else if (id === 'review') { renderReview(main); document.title = '复习 · 从维滕堡到山上之城'; }
-    else { renderHome(main); document.title = '从维滕堡到山上之城'; }
+    if (byId(id)) { renderLesson(main, byId(id)); store.set('last', id); document.title = byId(id).title + ' · ' + SITE; }
+    else if (id === 'review') { renderReview(main); document.title = '复习 · ' + SITE; }
+    else { renderHome(main); document.title = SITE; }
     markNav(id);
     window.scrollTo(0, 0);
   }
@@ -164,8 +182,8 @@
       <header class="hero">
         <div>
           <p class="eyebrow hero-press">教会史 · 第 ${LESSONS[0].no}–${LESSONS[LESSONS.length - 1].no} 课</p>
-          <h1 class="hero-press">从维滕堡<span class="to">— 1517 · 1662 —</span>到山上之城</h1>
-          <p class="lede">一扇教堂的门，一本译成百姓语言的圣经，几代愿意为真理付代价的人。跟着路德、慈运理、加尔文、丁道尔和清教徒，走一遍神在历史中复兴祂教会的路。</p>
+          <h1 class="hero-press">从耶路撒冷<span class="to">— 使徒行传 8 章 · 1662 —</span>到山上之城</h1>
+          <p class="lede">从耶路撒冷的逼迫，到尼西亚的信经；从东西方的分裂，到维滕堡的一扇门、清教徒的新英格兰。跟着殉道者、教父、改教家和清教徒，走一遍神在历史中保守、复兴祂教会的路。</p>
           <div class="btn-row">
             ${last ? `<a class="btn" href="#${esc(last.id)}">继续：第 ${last.no} 课 ${esc(last.title)}</a>` : `<a class="btn" href="#${esc(first.id)}">从第 ${first.no} 课开始</a>`}
             <a class="btn ghost" href="#review">复习与测验</a>
@@ -184,8 +202,8 @@
       </header>
 
       <section class="block">
-        <div class="block-head"><h2>四卷书</h2><span class="aside">点一本书开始；进度保存在本机浏览器</span></div>
-        <div class="shelf">
+        <div class="block-head"><h2>${CN_NUM[LESSONS.length] || LESSONS.length}卷书</h2><span class="aside">点一本书开始；进度保存在本机浏览器</span></div>
+        <div class="shelf" style="--n:${LESSONS.length}">
           ${LESSONS.map(L => {
             const pct = Math.round(Util.lessonProgress(L, progress.of(L.id)) * 100);
             return `<a class="book" href="#${esc(L.id)}" style="${accentStyle(L)}">
@@ -207,7 +225,7 @@
       </section>
 
       <section class="block">
-        <div class="block-head"><h2>地图上的改革</h2><span class="aside">点城市看发生了什么</span></div>
+        <div class="block-head"><h2>地图上的教会史</h2><span class="aside">点城市看发生了什么</span></div>
         <div id="home-map"></div>
       </section>
 
@@ -217,7 +235,7 @@
           <a class="tool" href="#review" data-tab="flash"><h3>关键词闪卡</h3><p>翻卡片记住 ${count('terms')} 个关键词：唯独信心、规范性原则、半途契约……</p></a>
           <a class="tool" href="#review" data-tab="order"><h3>时间线挑战</h3><p>随机抽 6 件大事，排出先后。</p></a>
           <a class="tool" href="#review" data-tab="who"><h3>我是谁？</h3><p>读简介，猜人物。</p></a>
-          <a class="tool" href="#review" data-tab="quiz"><h3>混合测验</h3><p>从四课里随机抽 10 题。</p></a>
+          <a class="tool" href="#review" data-tab="quiz"><h3>混合测验</h3><p>从各课里随机抽 10 题。</p></a>
         </div>
       </section>
 
@@ -233,7 +251,7 @@
     main.appendChild(v);
     $$('.tool[data-tab]', v).forEach(a => a.addEventListener('click', () => store.set('reviewTab', a.dataset.tab)));
     $('#home-tl', v).appendChild(timelineView(LESSONS, { filter: true }));
-    $('#home-map', v).appendChild(mapView({ places: Util.mergePlaces(LESSONS), lessons: LESSONS }));
+    $('#home-map', v).appendChild(homeMap(LESSONS));
   }
 
   /* ---------- 时间轴 ---------- */
@@ -245,8 +263,11 @@
       for (const L of lessons) if (active.has(L.id)) for (const e of L.events) evs.push({ ...e, L });
       evs.sort((a, b) => a.year - b.year);
       // 事件越多画布越宽，保证密集的 1520–1560 年间标签不互相覆盖
-      const W = Math.max(1400, evs.length * 58);
-      const xs = evs.map(e => Util.timeX(e.year, W));
+      const bands = lessons.filter(L => active.has(L.id));
+      const yrs = evs.map(e => e.year).concat(...bands.map(L => L.years));
+      const W = Math.max(1400, Math.round(Util.timeScale(yrs, 1000).weight * 58));
+      const X = Util.timeScale(yrs, W);
+      const xs = evs.map(e => X(e.year));
       const widths = evs.map(e => 64 + e.title.length * 13.5);
       const lanes = Util.assignLanes(xs.map(x => x - 6), widths, 16);
       const nUp = Math.ceil((Math.max(0, ...lanes) + 1) / 2);
@@ -257,12 +278,17 @@
       const H = downStart + nDown * 30 + 20;
       const tl = el(`<div class="tl" style="width:${W}px;height:${H}px"></div>`);
       tl.appendChild(el(`<div class="tl-axis" style="top:${axisY}px"></div>`));
-      const ticks = [1150, 1300, 1450, 1500, 1520, 1540, 1560, 1580, 1600, 1620, 1640, 1660, 1680, 1700];
-      for (const t of ticks) tl.appendChild(el(`<span class="tl-tick" style="left:${Util.timeX(t, W)}px;top:${axisY + 58 + lessons.length * 11}px">${t}</span>`));
-      tl.appendChild(el(`<span class="tl-break" style="left:${Util.timeX(1480, W)}px;top:${axisY - 22}px">≈ 前面几百年被压缩显示</span>`));
+      // 刻度每 50 年一个，太挤的跳过；比例尺不均匀，所以刻度间距本身就提示"这里被压缩了"
+      let lastX = -Infinity;
+      for (let t = Math.ceil(X.lo / 50) * 50; t <= X.hi; t += 50) {
+        const x = X(t);
+        if (x - lastX < 56) continue;
+        lastX = x;
+        tl.appendChild(el(`<span class="tl-tick" style="left:${x}px;top:${axisY + 58 + lessons.length * 11}px">${t}</span>`));
+      }
       lessons.forEach((L, i) => {
         if (!active.has(L.id)) return;
-        const x0 = Util.timeX(L.years[0], W), x1 = Util.timeX(L.years[1], W);
+        const x0 = X(L.years[0]), x1 = X(L.years[1]);
         tl.appendChild(el(`<div class="tl-band" title="第 ${L.no} 课 ${esc(L.title)}" style="${accentStyle(L)};left:${x0}px;width:${x1 - x0}px;top:${bandsY + i * 11}px"></div>`));
       });
       evs.forEach((e, i) => {
@@ -284,8 +310,7 @@
       const sc = $('.tl-scroll', wrap);
       sc.innerHTML = '';
       sc.appendChild(tl);
-      // 默认滚到 1517 附近，那是故事的起点
-      requestAnimationFrame(() => { sc.scrollLeft = Math.max(0, Util.timeX(1505, W) - 60); });
+      sc.scrollLeft = 0;
     };
     if (filter) {
       const f = $('.tl-filters', wrap);
@@ -304,31 +329,58 @@
   }
 
   /* ---------- 地图 ---------- */
+  // 首页地图：九课的城市全画在一张图上会挤成一团，所以默认只显示"早期教会"或"宗教改革"一组，也可单选某课
+  function homeMap(lessons) {
+    const wrap = el(`<div><div class="tl-filters" role="group" aria-label="按课筛选"></div><div class="map-host"></div></div>`);
+    const f = $('.tl-filters', wrap), host = $('.map-host', wrap);
+    const groups = [
+      { label: '第 1–5 课 · 早期与中世纪', ls: lessons.filter(L => L.no <= 5) },
+      { label: '第 6–9 课 · 宗教改革', ls: lessons.filter(L => L.no >= 6) },
+    ].filter(g => g.ls.length);
+    const opts = groups.concat(lessons.map(L => ({ label: `第 ${L.no} 课`, ls: [L] })));
+    const chips = opts.map(o => {
+      const c = el(`<button type="button" class="chip" aria-pressed="false">${esc(o.label)}</button>`);
+      c.onclick = () => show(o, c);
+      f.appendChild(c);
+      return c;
+    });
+    function show(o, c) {
+      chips.forEach(x => x.setAttribute('aria-pressed', String(x === c)));
+      host.innerHTML = '';
+      host.appendChild(mapView({ places: Util.mergePlaces(o.ls), lessons: o.ls }));
+    }
+    if (opts.length) show(opts[0], chips[0]);
+    return wrap;
+  }
+
   function mapView({ places, lessons, journey }) {
     const wrap = el(`<div><div class="tl-scroll map-scroll"><div class="map-wrap" style="min-width:640px"></div></div><div class="map-info" aria-live="polite"><p class="muted">点地图上的城市。</p></div></div>`);
     if (!MAP) { $('.map-wrap', wrap).innerHTML = '<p class="empty">地图数据未加载</p>'; return wrap; }
     const mw = $('.map-wrap', wrap);
-    const views = { europe: MAP.europe, newEngland: MAP.newEngland };
-    const where = p => Util.inView(views.europe, p.lon, p.lat) ? 'europe' : (Util.inView(views.newEngland, p.lon, p.lat) ? 'newEngland' : null);
+    const main = Util.mainView(MAP, places);
+    const views = { [main]: MAP[main], newEngland: MAP.newEngland };
+    const where = p => Util.inView(views[main], p.lon, p.lat) ? main : (Util.inView(views.newEngland, p.lon, p.lat) ? 'newEngland' : null);
     const svgs = {};
     const needInset = places.some(p => where(p) === 'newEngland');
 
-    for (const key of ['europe', 'newEngland']) {
+    for (const key of [main, 'newEngland']) {
       if (key === 'newEngland' && !needInset) continue;
       const V = views[key];
       let grid = '';
-      if (key === 'europe') {
-        for (let lon = -10; lon <= 25; lon += 5) { const [x] = Util.project(V, lon, 0); grid += `<path class="map-grid" d="M${x.toFixed(1)},0V${V.height}"/><text class="map-grid-lbl" x="${x + 3}" y="${V.height - 6}">${Math.abs(lon)}°${lon < 0 ? 'W' : 'E'}</text>`; }
-        for (let lat = 45; lat <= 55; lat += 5) { const [, y] = Util.project(V, 0, lat); grid += `<path class="map-grid" d="M0,${y.toFixed(1)}H${V.width}"/><text class="map-grid-lbl" x="${V.width - 34}" y="${y - 4}">${lat}°N</text>`; }
+      if (key === main) {
+        const step = main === 'europe' ? 5 : 10;
+        for (let lon = Math.ceil(V.lon0 / step) * step; lon <= V.lon1; lon += step) { const [x] = Util.project(V, lon, 0); grid += `<path class="map-grid" d="M${x.toFixed(1)},0V${V.height}"/><text class="map-grid-lbl" x="${x + 3}" y="${V.height - 6}">${Math.abs(lon)}°${lon < 0 ? 'W' : 'E'}</text>`; }
+        for (let lat = Math.ceil(V.lat0 / 5) * 5 + 5; lat < V.lat1; lat += 5) { const [, y] = Util.project(V, 0, lat); grid += `<path class="map-grid" d="M0,${y.toFixed(1)}H${V.width}"/><text class="map-grid-lbl" x="${V.width - 34}" y="${y - 4}">${lat}°N</text>`; }
       }
-      const svg = el(`<svg viewBox="0 0 ${V.width} ${V.height}" role="img" aria-label="${key === 'europe' ? '欧洲地图' : '新英格兰地图'}"><path class="map-land" d="${V.path}"/>${grid}<g class="jr"></g><g class="pts"></g></svg>`);
+      const label = { europe: '欧洲地图', mediterranean: '地中海世界地图', newEngland: '新英格兰地图' }[key];
+      const svg = el(`<svg viewBox="0 0 ${V.width} ${V.height}" role="img" aria-label="${label}"><path class="map-land" d="${V.path}"/>${grid}<g class="jr"></g><g class="pts"></g></svg>`);
       svgs[key] = svg;
-      if (key === 'europe') mw.appendChild(svg);
+      if (key === main) mw.appendChild(svg);
       else { const box = el(`<div class="map-inset"><span class="cap">新英格兰（北美）</span></div>`); box.appendChild(svg); mw.appendChild(box); }
     }
 
     // 标签避让：右、左、上、下，都放不下就只显示圆点
-    const boxes = { europe: [], newEngland: [] };
+    const boxes = { [main]: [], newEngland: [] };
     const overlaps = (b, list) => list.some(o => b.x < o.x + o.w && b.x + b.w > o.x && b.y < o.y + o.h && b.y + b.h > o.y);
     const ptEls = {};
     const pts = places.map(p => ({ p, key: where(p) })).filter(o => o.key);
@@ -366,8 +418,8 @@
 
     // 旅程模式：画路线 + 可移动的标记
     if (journey) {
-      const V = views.europe, svg = svgs.europe;
-      const stops = journey.stops.map(s => ({ ...s, place: places.find(p => p.id === s.place) })).filter(s => s.place && where(s.place) === 'europe');
+      const V = views[main], svg = svgs[main];
+      const stops = journey.stops.map(s => ({ ...s, place: places.find(p => p.id === s.place) })).filter(s => s.place && where(s.place) === main);
       const xy = stops.map(s => Util.project(V, s.place.lon, s.place.lat));
       const path = el(`<svg><path class="jr-path" d="M${xy.map(p => p.map(n => n.toFixed(1)).join(',')).join('L')}"/></svg>`).firstElementChild;
       const marker = el(`<svg><g class="jr-marker"><circle r="11"/></g></svg>`).firstElementChild;

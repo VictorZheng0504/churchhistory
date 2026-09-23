@@ -383,13 +383,13 @@
       q: '慈运理在苏黎世的改革是从哪件事开始的？',
       options: ['在教堂门上张贴论纲', '1519 年元旦开始逐章讲解马太福音', '焚烧教皇的谕令', '把圣经翻译成德文'],
       answer: 1,
-      explain: '讲稿把苏黎世改革的开端定在 1519 年元旦：慈运理从马太福音第一章讲起，连家谱也照讲。张贴论纲和焚烧谕令是路德的事。'
+      explain: '本课把苏黎世改革的开端定在 1519 年元旦：慈运理从马太福音第一章讲起，连家谱也照讲。张贴论纲和焚烧谕令是路德的事。'
     },
     {
       q: '1523 年第一次苏黎世辩论，为什么对浸信会特别有启发？',
       options: ['因为它由教皇主持', '因为慈运理在会上主张信徒受浸', '因为慈运理把约六百名普通基督徒的聚集视为在圣经之下合法的教会会议', '因为它决定了加尔文的去留'],
       answer: 2,
-      explain: '天主教当局震惊于慈运理竟认为普通信徒在圣经权威下的聚集，可以与教皇主持的会议相比——讲稿以此说明会众的角色。'
+      explain: '天主教当局震惊于慈运理竟认为普通信徒在圣经权威下的聚集，可以与教皇主持的会议相比——这正说明了会众的角色。'
     },
     {
       q: '慈运理说依靠礼仪得救就像什么？',
@@ -454,7 +454,7 @@
     { title: 'John Calvin', author: 'T. H. L. Parker', note: '简明可读的加尔文传记（Westminster）。' },
     { title: 'Calvin', author: 'Bruce Gordon', note: '近年的学术性传记（Yale）。' },
     { title: 'The Unquenchable Flame', author: 'Michael Reeves', note: '宗教改革入门，生动易读（B&H）。' },
-    { title: 'Theology of the Reformers', author: 'Timothy George', note: '讲稿主要参考书，分章介绍路德、慈运理、加尔文等人的神学（B&H）。' }
+    { title: 'Theology of the Reformers', author: 'Timothy George', note: '本课主要参考书，分章介绍路德、慈运理、加尔文等人的神学（B&H）。' }
   ],
 
   meta: {

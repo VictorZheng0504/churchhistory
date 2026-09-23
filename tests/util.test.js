@@ -22,13 +22,24 @@ test('checkOrder 标出位置对错', () => {
   assert.deepStrictEqual(U.checkOrder([{ year: 1 }, { year: 2 }]), [true, true]);
 });
 
-test('timeX 单调且落在画布内', () => {
+test('timeScale 单调、落在画布内，事件密的年代更宽', () => {
+  const years = [30, 64, 313, 325, 451, 1054, 1517, 1520, 1521, 1521, 1525, 1530, 1536, 1541];
+  const X = U.timeScale(years, 1000);
   let prev = -1;
-  for (let y = 1100; y <= 1720; y += 10) {
-    const x = U.timeX(y, 1000);
-    assert.ok(x > prev && x >= 40 && x <= 960, `year ${y} → ${x}`);
+  for (let y = 0; y <= 1600; y += 5) {
+    const x = X(y);
+    assert.ok(x >= prev && x >= 40 && x <= 960, `year ${y} → ${x}`);
     prev = x;
   }
+  assert.ok(X(1525) - X(1500) > X(1100) - X(1075), '1500–1525 应比空白的 1075–1100 宽');
+  assert.strictEqual(X(-100), X(X.lo));
+});
+
+test('mainView 地点都在欧洲图内才用欧洲图', () => {
+  const V = { europe: { lon0: -11, lon1: 26, lat0: 40, lat1: 58.5 }, newEngland: { lon0: -74, lon1: -69, lat0: 40, lat1: 43 } };
+  const wittenberg = { lon: 12.6, lat: 51.9 }, boston = { lon: -71, lat: 42.4 }, jerusalem = { lon: 35.2, lat: 31.8 };
+  assert.strictEqual(U.mainView(V, [wittenberg, boston]), 'europe');
+  assert.strictEqual(U.mainView(V, [wittenberg, jerusalem]), 'mediterranean');
 });
 
 test('assignLanes 不重叠', () => {

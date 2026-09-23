@@ -137,7 +137,7 @@ section.block { margin-top: 4.5rem; }
 .colophon .big { font-family: var(--f-lat); font-size: 3rem; line-height: 1; color: var(--rubric); }
 
 /* 书架：四课是四本书 */
-.shelf { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; align-items: end; padding-bottom: .9rem; border-bottom: 10px solid color-mix(in srgb, var(--ink) 80%, var(--gold)); }
+.shelf { display: grid; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); gap: 1rem; align-items: end; padding-bottom: .9rem; border-bottom: 10px solid color-mix(in srgb, var(--ink) 80%, var(--gold)); }
 .book {
   --h: 21rem; position: relative; display: flex; flex-direction: column; text-decoration: none; min-height: var(--h);
   background: var(--accent); color: #fff; border-radius: 3px 8px 8px 3px; padding: 1rem 1rem 1.1rem 1.35rem;
@@ -176,7 +176,6 @@ section.block { margin-top: 4.5rem; }
 .tl-tick { position: absolute; transform: translateX(-50%); font-family: var(--f-lat); font-size: .95rem; color: var(--muted); }
 .tl-tick::before { content: ""; position: absolute; left: 50%; top: -8px; width: 1px; height: 6px; background: var(--muted); }
 .tl-band { position: absolute; height: 8px; border-radius: 4px; background: var(--accent); opacity: .85; }
-.tl-break { position: absolute; font-family: var(--f-sans); font-size: var(--fs-0); color: var(--muted); transform: translateX(-50%); }
 .tl-ev {
   position: absolute; transform: translateX(-6px); display: flex; align-items: center; gap: .35rem; cursor: pointer;
   background: none; border: 0; padding: 0; text-align: left; font-family: var(--f-sans); font-size: var(--fs-0); white-space: nowrap;

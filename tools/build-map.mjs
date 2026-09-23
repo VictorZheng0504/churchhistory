@@ -33,11 +33,14 @@ function makeView({ lon0, lon1, lat0, lat1, width }) {
 }
 
 const data = {
-  europe: makeView({ lon0: -11, lon1: 26, lat0: 40, lat1: 58.5, width: 1000 }),
+  // 宗教改革时代（第 6–9 课）
+  europe: makeView({ lon0: -11, lon1: 30, lat0: 40, lat1: 58.5, width: 1000 }),
+  // 早期教会与中世纪（第 1–5 课）：要容下耶路撒冷、亚历山大、迦太基
+  mediterranean: makeView({ lon0: -11, lon1: 42, lat0: 29, lat1: 56, width: 1000 }),
   newEngland: makeView({ lon0: -74.2, lon1: -69.6, lat0: 40.8, lat1: 43.2, width: 300 }),
 };
 
 const out = '// 自动生成，勿手改。来源：world-atlas land-50m（Natural Earth，公有领域）。重新生成：npm run build:map\n' +
   'window.MAP_DATA = ' + JSON.stringify(data) + ';\n';
 fs.writeFileSync(new URL('../assets/map-data.js', import.meta.url), out);
-console.log('map-data.js', (out.length / 1024).toFixed(1) + ' KB', data.europe.height, data.newEngland.height);
+console.log('map-data.js', (out.length / 1024).toFixed(1) + ' KB', data.europe.height, data.mediterranean.height, data.newEngland.height);
