@@ -522,6 +522,7 @@
         <div class="ch-meta"><span class="lat">${['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV', 'XVI'][i] || i + 1}</span>${c.years ? `<span>${esc(c.years)}</span>` : ''}</div>
         <h2>${esc(c.title)}</h2>
         <div class="body">${c.body.map(t => `<p>${linkTerms(t)}</p>`).join('')}</div>
+        ${(c.figures || []).map(f => `<figure class="ch-fig"><a href="${esc(f.src)}" target="_blank" rel="noopener" title="在新标签页看大图"><img src="${esc(f.src)}" alt="${esc(f.alt || f.caption)}" loading="lazy" decoding="async"></a><figcaption>${esc(f.caption)}${f.credit ? `<span class="credit">${esc(f.credit)}</span>` : ''}</figcaption></figure>`).join('')}
         ${(c.notes || []).map(n => `<p class="src-note"><span class="tag">批注</span>${esc(n)}</p>`).join('')}
         ${h ? `<aside class="hl ${esc(h.type || 'note')}">${h.type === 'quote' ? '' : `<span class="tag">${h.type === 'fact' ? '史实' : '批注'}</span>`}${esc(h.text)}${h.source ? `<cite>—— ${esc(h.source)}</cite>` : ''}</aside>` : ''}
       </article>`);
