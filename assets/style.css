@@ -137,7 +137,8 @@ section.block { margin-top: 4.5rem; }
 .colophon .big { font-family: var(--f-lat); font-size: 3rem; line-height: 1; color: var(--rubric); }
 
 /* 书架：四课是四本书 */
-.shelf { display: grid; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); gap: 1rem; align-items: end; padding-bottom: .9rem; border-bottom: 10px solid color-mix(in srgb, var(--ink) 80%, var(--gold)); }
+/* 超过 5 本分两排，书脊上的标题才放得下 */
+.shelf { display: grid; grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); gap: 1.6rem 1rem; align-items: end; padding-bottom: .9rem; border-bottom: 10px solid color-mix(in srgb, var(--ink) 80%, var(--gold)); }
 .book {
   --h: 21rem; position: relative; display: flex; flex-direction: column; text-decoration: none; min-height: var(--h);
   background: var(--accent); color: #fff; border-radius: 3px 8px 8px 3px; padding: 1rem 1rem 1.1rem 1.35rem;

@@ -203,7 +203,7 @@
 
       <section class="block">
         <div class="block-head"><h2>${CN_NUM[LESSONS.length] || LESSONS.length}卷书</h2><span class="aside">点一本书开始；进度保存在本机浏览器</span></div>
-        <div class="shelf" style="--n:${LESSONS.length}">
+        <div class="shelf" style="--n:${LESSONS.length <= 5 ? LESSONS.length : Math.ceil(LESSONS.length / 2)}">
           ${LESSONS.map(L => {
             const pct = Math.round(Util.lessonProgress(L, progress.of(L.id)) * 100);
             return `<a class="book" href="#${esc(L.id)}" style="${accentStyle(L)}">

@@ -3,6 +3,7 @@
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import fs from 'node:fs';
+import vm from 'node:vm';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const require = createRequire(import.meta.url);
@@ -13,6 +14,12 @@ const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const URL0 = pathToFileURL(path.join(ROOT, 'index.html')).href;
 const SHOTS = process.argv.includes('--shots');
 if (SHOTS) fs.mkdirSync(path.join(ROOT, 'screenshots'), { recursive: true });
+
+// 课程列表从 index.html 实际加载的数据文件里读，新增一课不用改这里
+const sandbox = { window: {} }; vm.createContext(sandbox);
+for (const [, f] of fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8').matchAll(/src="(data\/lesson-\d+\.js)"/g))
+  vm.runInContext(fs.readFileSync(path.join(ROOT, f), 'utf8'), sandbox);
+const IDS = sandbox.window.COURSE_LESSONS.map(l => l.id);
 
 const browser = await playwright.chromium.launch();
 const failures = [];
@@ -31,14 +38,14 @@ const shot = (page, n, full = false) => SHOTS && page.screenshot({ path: path.jo
 await run('首页', 1280, async page => {
   await page.goto(URL0);
   await page.waitForSelector('.book');
-  if ((await page.$$('.book')).length !== 4) throw new Error('书架不是 4 本书');
+  if ((await page.$$('.book')).length !== IDS.length) throw new Error(`书架不是 ${IDS.length} 本书`);
   await page.click('.tl-ev');
   await page.click('.map-pt');
   await shot(page, 'home');
   await shot(page, 'home-full', true);
 });
 
-for (const id of ['luther', 'calvin', 'england', 'puritans']) {
+for (const id of IDS) {
   await run(`课程 ${id}`, 1280, async page => {
     await page.goto(URL0 + '#' + id);
     await page.waitForSelector('.chapter');
