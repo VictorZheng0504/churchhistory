@@ -234,7 +234,7 @@
     { id: 'chbc-building', year: 1911, title: '新礼拜堂献堂', desc: '鲍尔牧师任内，拆掉拥挤的旧建筑，建成今天国会山浸信会的礼拜堂。', place: 'washington-dc' },
     { id: 'romans', year: 1918, title: '巴特《罗马书注释》问世', desc: '瑞士牧师巴特一举成名，新正统神学由此兴起（另有资料作 1919 年）。' },
     { id: 'fosdick-sermon', year: 1922, title: '富司迪《基要派会得胜吗？》', desc: '自由派牧师的讲章广为散发，“基要派”成了贬义标签。', place: 'new-york' },
-    { id: 'christianity-liberalism', year: 1923, title: '梅钦《基督教与自由主义》出版', desc: '指出基督教与自由主义是两种完全不同的宗教。', place: 'princeton' },
+    { id: 'christianity-liberalism', year: 1923, title: '梅钦《基督教与自由主义》出版', desc: '指出基督教与自由主义是两种完全不同的宗教。', place: 'princeton', milestone: true },
     { id: 'scopes', year: 1925, title: '斯科普斯“猴子审判”', desc: '中学教师因讲授进化论受审；媒体把基要派描绘成愚昧落后。', place: 'dayton-tn' },
     { id: 'westminster', year: 1929, title: '威斯敏斯特神学院创立', desc: '普林斯顿神学院改组后，梅钦辞职，在费城另立神学院。', place: 'philadelphia' },
     { id: 'nae', year: 1942, title: '全国福音派协会成立', desc: '新福音派的第一个全国性跨宗派组织，奥肯加任首任会长。' },

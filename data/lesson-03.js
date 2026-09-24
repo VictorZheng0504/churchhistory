@@ -302,7 +302,7 @@
     { id: 'e313', year: 313, title: '《米兰敕令》', desc: '基督徒获得敬拜自由，财产与教堂得以归还，并可公开在政府任职。', place: 'milan' },
     { id: 'e318', year: 318, title: '亚流之争爆发', desc: '亚历山大城的长老亚流主张圣子是被造的，引发激烈争论。', place: 'alexandria' },
     { id: 'e321', year: 321, title: '亚历山大会议定罪亚流', desc: '亚流被革职，教义被定罪，但争端反而扩大。', place: 'alexandria' },
-    { id: 'e325', year: 325, title: '尼西亚会议', desc: '第一次大公会议：宣告圣子与圣父同质，亚流被逐出教会。', place: 'nicaea' },
+    { id: 'e325', year: 325, title: '尼西亚会议', desc: '第一次大公会议：宣告圣子与圣父同质，亚流被逐出教会。', place: 'nicaea', milestone: true },
     { id: 'e337', year: 337, title: '君士坦丁去世', desc: '临终前才受洗。此后的皇帝在正统、亚流派与异教之间摇摆。', place: 'constantinople' },
     { id: 'e354', year: 354, title: '奥古斯丁出生', desc: '生于今阿尔及利亚境内的一个北非小镇。', place: 'hippo' },
     { id: 'e374', year: 374, title: '哲罗姆赴罗马', desc: '担任教皇达马苏的秘书，受托把圣经重新译成拉丁文。', place: 'rome' },

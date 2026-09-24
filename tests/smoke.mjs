@@ -38,7 +38,8 @@ const shot = (page, n, full = false) => SHOTS && page.screenshot({ path: path.jo
 await run('首页', 1280, async page => {
   await page.goto(URL0);
   await page.waitForSelector('.book');
-  if ((await page.$$('.book')).length !== IDS.length) throw new Error(`书架不是 ${IDS.length} 本书`);
+  // 导论也是一本书
+  if ((await page.$$('.book')).length !== IDS.length + 1) throw new Error(`书架不是 ${IDS.length + 1} 本书`);
   await page.click('.tl-ev');
   await page.click('.map-pt');
   await shot(page, 'home');
@@ -65,6 +66,14 @@ for (const id of IDS) {
   });
 }
 
+await run('导论', 1280, async page => {
+  await page.goto(URL0 + '#overview');
+  await page.waitForSelector('.gantt');
+  const rows = (await page.$$('.g-row')).length, dots = (await page.$$('.g-dot')).length, items = (await page.$$('.ov-list li')).length;
+  if (rows !== IDS.length || dots !== IDS.length || items !== IDS.length) throw new Error(`行 ${rows} / 圆点 ${dots} / 条目 ${items}，应各为 ${IDS.length}`);
+  await shot(page, 'overview-full', true);
+});
+
 await run('复习页', 1280, async page => {
   await page.goto(URL0 + '#review');
   for (const tab of ['flash', 'order', 'who', 'quiz']) {
@@ -78,7 +87,7 @@ await run('复习页', 1280, async page => {
 });
 
 await run('手机宽度无横向滚动', 390, async page => {
-  for (const h of ['', '#luther', '#puritans', '#review']) {
+  for (const h of ['', '#overview', '#luther', '#puritans', '#review']) {
     await page.goto(URL0 + h);
     await page.waitForTimeout(300);
     const over = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);

@@ -261,7 +261,7 @@
     { id: 'tyndale-nt', year: 1525, title: '丁道尔完成英文新约', desc: '流亡欧陆的丁道尔从希腊文译成英文新约，随后流回英格兰。' },
     { id: 'wolsey-falls', year: 1528, title: '沃尔西下台', desc: '亨利让国会控告沃尔西，沃尔西认罪下台——亨利对教会权柄的第一场胜利。', place: 'london' },
     { id: 'annulment', year: 1533, title: '克兰麦宣告婚姻无效', desc: '坎特伯雷大主教克兰麦宣告亨利与凯瑟琳的婚姻无效，并为亨利和安妮·博林主持婚礼。', place: 'canterbury' },
-    { id: 'supremacy', year: 1534, title: '《至尊法案》', desc: '国会把英格兰教会的绝对权柄交给国王，与罗马的决裂完成。', place: 'london' },
+    { id: 'supremacy', year: 1534, title: '《至尊法案》', desc: '国会把英格兰教会的绝对权柄交给国王，与罗马的决裂完成。', place: 'london', milestone: true },
     { id: 'tyndale-arrest', year: 1535, title: '丁道尔被出卖', desc: '亨利·菲利普斯把丁道尔骗出安特卫普英国商馆，他随即被捕。', place: 'antwerp' },
     { id: 'tyndale-death', year: 1536, title: '丁道尔殉道', desc: '8 月被定为顽固的异端，10 月被勒死焚尸。', place: 'vilvoorde' },
     { id: 'edward-king', year: 1547, title: '亨利去世，爱德华六世继位', desc: '九岁的新教少年王登基，由“护国公”辅政。', place: 'london' },

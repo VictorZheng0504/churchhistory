@@ -286,7 +286,7 @@
   ],
 
   events: [
-    { id: 'e30', year: 30, title: '司提反殉道，门徒分散', desc: '约在此时，耶路撒冷的教会大遭逼迫，门徒分散到犹太和撒马利亚，往各处去传道。', place: 'jerusalem' },
+    { id: 'e30', year: 30, title: '司提反殉道，门徒分散', desc: '约在此时，耶路撒冷的教会大遭逼迫，门徒分散到犹太和撒马利亚，往各处去传道。', place: 'jerusalem', milestone: true },
     { id: 'e62', year: 62, title: '福音传到罗马', desc: '使徒行传结尾，保罗在公元 60 年代初来到罗马，放胆传讲神国的道。', place: 'rome' },
     { id: 'e64', year: 64, title: '罗马大火与尼禄的逼迫', desc: '尼禄把大火归罪于基督徒，以兽皮、十字架、火把等方式残杀他们。', place: 'rome' },
     { id: 'e68', year: 68, title: '尼禄自杀', desc: '尼禄被政敌推翻，自杀身亡。' },

@@ -140,3 +140,25 @@ for (const L of lessons) {
 function allPlaceIds() {
   return new Set(lessons.flatMap(l => l.places.map(p => p.id)));
 }
+
+// 导论页：每课恰好一件代表事件，五个时代不重不漏地覆盖所有课
+test('导论：两千年一览', () => {
+  for (const L of lessons) {
+    const ms = L.events.filter(e => e.milestone);
+    assert.strictEqual(ms.length, 1, `第 ${L.no} 课应恰好有 1 个 milestone 事件，现有 ${ms.length} 个`);
+  }
+  const sandbox = { window: {} };
+  vm.createContext(sandbox);
+  vm.runInContext(fs.readFileSync(path.join(DATA, 'overview.js'), 'utf8'), sandbox, { filename: 'overview.js' });
+  const O = sandbox.window.COURSE_OVERVIEW;
+  assert.ok(O && O.title && Array.isArray(O.eras) && O.eras.length, 'overview.js 缺 title 或 eras');
+  // Array.from：沙箱里的数组原型不同，deepStrictEqual 会误判
+  const covered = Array.from(O.eras.flatMap(e => e.lessons));
+  assert.deepStrictEqual(covered.slice().sort((a, b) => a - b), Array.from(lessons, l => l.no).sort((a, b) => a - b), '时代划分必须恰好覆盖每一课一次');
+  assert.deepStrictEqual(covered, covered.slice().sort((a, b) => a - b), '时代内的课次须按顺序排列');
+  // 同一时代内按课次列出，代表事件的年份也要递增，否则列表读起来是倒着的
+  for (const era of O.eras) {
+    const ys = Array.from(era.lessons, no => lessons.find(l => l.no === no).events.find(e => e.milestone).year);
+    assert.deepStrictEqual(ys, ys.slice().sort((a, b) => a - b), `${era.name}：代表事件年份不是递增的 ${ys.join(', ')}`);
+  }
+});

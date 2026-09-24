@@ -268,7 +268,7 @@
     { id: 'philadelphia-assoc', year: 1707, title: '费城浸信会联会', desc: '美洲第一个有组织的浸信会联会。', place: 'philadelphia' },
     { id: 'first-amendment', year: 1791, title: '第一修正案通过', desc: '“国会不得制定关于确立国教或禁止信仰自由的法律。”' },
     { id: 'bms', year: 1792, title: '浸信会差会成立', desc: '克理、富勒等人在凯特林成立差会，现代宣教运动开始。', place: 'kettering' },
-    { id: 'carey-india', year: 1793, title: '克理抵达印度', desc: '克理一家航向印度，11 月抵达加尔各答。', place: 'calcutta' },
+    { id: 'carey-india', year: 1793, title: '克理抵达印度', desc: '克理一家航向印度，11 月抵达加尔各答。', place: 'calcutta', milestone: true },
     { id: 'haystack', year: 1806, title: '干草堆祷告会', desc: '威廉斯学院学生在干草堆下祷告，立志海外宣教，后来促成美部会。', place: 'williamstown' },
     { id: 'judson-sails', year: 1812, title: '耶德逊夫妇与莱斯出发', desc: '美部会第一批宣教士启航，途中接受信徒洗礼。', place: 'salem-ma' },
     { id: 'triennial', year: 1814, title: '三年大会成立', desc: '莱斯组织浸信会宗派差传总会，美国浸信会为宣教而联合。', place: 'philadelphia' },
