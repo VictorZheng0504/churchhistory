@@ -551,3 +551,227 @@ code { font-size: .9em; background: var(--paper-2); padding: 0 .3em; border-radi
   .ov-list li { grid-template-columns: 1fr; gap: .2rem; }
   .ov-year { font-size: 1.6rem; }
 }
+
+/* ================= 世界史视角（辅助板块） =================
+   故意和课文的"朱笔印刷书"不同：地图探索风——海青 + 琥珀、无衬线、圆角卡片、按地区上色。
+   路由到 #world* 时 <html data-section="world">，下面只重定义 token，其余组件照常工作。 */
+:root {
+  --wx-teal: #0d6e66; --wx-deep: #0a3f45; --wx-amber: #a8520a;
+  --rg-cn: #b3261e; --rg-eu: #1d56c9; --rg-am: #13723a; --rg-me: #9a4f08; --rg-sa: #6d35d0; --rg-ea: #b01f66; --rg-gl: #0d6e66;
+  --v-west: #1d56c9; --v-cn: #b3261e;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --wx-teal: #3fd0c0; --wx-deep: #0c3a40; --wx-amber: #f5b544;
+    --rg-cn: #ff8a80; --rg-eu: #8ab4ff; --rg-am: #6fdc95; --rg-me: #f5b544; --rg-sa: #c4a4ff; --rg-ea: #ff8cc3; --rg-gl: #3fd0c0;
+    --v-west: #8ab4ff; --v-cn: #ff8a80;
+  }
+}
+:root[data-theme="dark"] {
+  --wx-teal: #3fd0c0; --wx-deep: #0c3a40; --wx-amber: #f5b544;
+  --rg-cn: #ff8a80; --rg-eu: #8ab4ff; --rg-am: #6fdc95; --rg-me: #f5b544; --rg-sa: #c4a4ff; --rg-ea: #ff8cc3; --rg-gl: #3fd0c0;
+  --v-west: #8ab4ff; --v-cn: #ff8a80;
+}
+:root[data-section="world"] {
+  --paper: #eaf3f1; --paper-2: #dcebe7; --card: #ffffff;
+  --ink: #0f2b29; --ink-2: #33504c; --muted: #5a7571; --line: #c5dad5;
+  --sea: #d3e6e2; --land: #f7fbfa;
+  --shadow: 0 1px 2px rgb(15 43 41 / .06), 0 8px 22px rgb(15 43 41 / .08);
+  --radius: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-section="world"]:not([data-theme="light"]) {
+    --paper: #081a1c; --paper-2: #0d2427; --card: #10292d;
+    --ink: #e2f1ee; --ink-2: #b4ccc7; --muted: #82a19b; --line: #21423f;
+    --sea: #0b2023; --land: #143034;
+    --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 10px 26px rgb(0 0 0 / .35);
+  }
+}
+:root[data-section="world"][data-theme="dark"] {
+  --paper: #081a1c; --paper-2: #0d2427; --card: #10292d;
+  --ink: #e2f1ee; --ink-2: #b4ccc7; --muted: #82a19b; --line: #21423f;
+  --sea: #0b2023; --land: #143034;
+  --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 10px 26px rgb(0 0 0 / .35);
+}
+:root[data-section="world"] body { --accent: var(--wx-teal); }
+:root[data-section="world"] .brand .lat { color: var(--wx-teal); }
+:root[data-section="world"] .nav a[aria-current="page"] { background: var(--wx-teal); color: var(--card); }
+
+.wx { --accent: var(--wx-teal); font-family: var(--f-sans); }
+/* --lesson 要在带 --lesson-raw 的元素自身上计算，否则子卡片继承的是外层的值 */
+.wx, .wx [style*="--lesson-raw"] { --lesson: var(--lesson-raw, var(--rubric)); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .wx, :root:not([data-theme="light"]) .wx [style*="--lesson-raw"] { --lesson: color-mix(in oklab, var(--lesson-raw, #e46a55) 55%, #fff); }
+}
+:root[data-theme="dark"] .wx, :root[data-theme="dark"] .wx [style*="--lesson-raw"] { --lesson: color-mix(in oklab, var(--lesson-raw, #e46a55) 55%, #fff); }
+.wx .tag { font-family: var(--f-sans); font-size: var(--fs-0); font-weight: 700; letter-spacing: .08em; }
+
+/* 头图：海青渐变 + 经纬网 */
+.wx-hero {
+  position: relative; overflow: hidden; margin-top: 1.5rem; padding: clamp(1.5rem, 5vw, 3rem);
+  border-radius: calc(var(--radius) + 6px); color: #f2fbf9;
+  background:
+    repeating-linear-gradient(0deg, rgb(255 255 255 / .06) 0 1px, transparent 1px 44px),
+    repeating-linear-gradient(90deg, rgb(255 255 255 / .06) 0 1px, transparent 1px 44px),
+    radial-gradient(120% 90% at 85% 10%, #1b8f84 0%, transparent 60%),
+    linear-gradient(135deg, #0a4f55 0%, #0b3140 100%);
+}
+.wx-globe { position: absolute; right: -3rem; top: -2.5rem; width: 17rem; height: 17rem; fill: none; stroke: rgb(255 255 255 / .22); stroke-width: 1.2; pointer-events: none; }
+.wx-kicker { font-size: var(--fs-0); letter-spacing: .16em; font-weight: 700; color: #ffd48a; }
+.wx-hero h1 { position: relative; font-size: var(--fs-6); margin-top: .5rem; max-width: 18ch; }
+.wx-subtitle { position: relative; font-size: var(--fs-3); font-weight: 700; margin-top: .6rem; color: #bfeee6; }
+.wx-lede { position: relative; margin-top: 1rem; max-width: 42rem; font-size: var(--fs-2); line-height: 1.75; color: #dcefeb; }
+.wx-stats { position: relative; display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.5rem; }
+.wx-stats span { background: rgb(255 255 255 / .12); border: 1px solid rgb(255 255 255 / .2); border-radius: 99px; padding: .3rem .85rem; font-size: var(--fs-0); }
+.wx-stats b { font-size: 1.15rem; margin-right: .2rem; color: #ffd48a; }
+.wx-btns { position: relative; margin-top: 1.5rem; }
+.wx-hero .btn { background: #ffd48a; border-color: #ffd48a; color: #0b3140; }
+.wx-hero .btn.ghost { background: transparent; border-color: rgb(255 255 255 / .45); color: #f2fbf9; }
+.wx-note { margin-top: 1rem; font-size: var(--fs-0); color: var(--muted); padding: .55rem .9rem; border-radius: 99px; background: var(--paper-2); display: inline-block; }
+
+.wx .block { margin-top: 3.5rem; }
+.wx-head { display: flex; align-items: baseline; flex-wrap: wrap; gap: .4rem 1rem; margin-bottom: 1.1rem; }
+.wx-head h2 { font-size: var(--fs-4); position: relative; padding-left: 1rem; }
+.wx-head h2::before { content: ""; position: absolute; left: 0; top: .2em; bottom: .2em; width: 5px; border-radius: 3px; background: linear-gradient(var(--wx-teal), var(--wx-amber)); }
+.wx-head span { font-size: var(--fs-0); color: var(--muted); }
+
+/* 目录：时间长河 + 目的地卡片 */
+.wx-river { position: relative; height: calc(2.9rem + var(--rows, 3) * 1.7rem); background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); margin-inline: 0; padding: 0; }
+.wx-seg { position: absolute; top: calc(1rem + var(--row) * 1.7rem); height: 1.35rem; min-width: 6px; border-radius: 99px; background: var(--lesson); text-decoration: none; display: flex; align-items: center; justify-content: center; transition: transform .15s; }
+.wx-seg span { font-size: .7rem; font-weight: 800; color: #fff; }
+.wx-seg:hover, .wx-seg:focus-visible { transform: scaleY(1.25); }
+.wx-axis { position: absolute; left: 0; right: 0; bottom: .45rem; height: 1rem; border-top: 1px dashed var(--line); }
+.wx-axis span { position: absolute; transform: translateX(-50%); font-size: .7rem; color: var(--muted); padding-top: .15rem; }
+.wx-axis span:first-child { transform: none; }
+.wx-axis span:last-child { transform: translateX(-100%); }
+
+.wx-dests { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); gap: 1rem; }
+.wx-dest a { position: relative; display: flex; flex-direction: column; gap: .35rem; height: 100%; padding: 1.1rem 1.2rem 1rem; text-decoration: none; background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); border-top: 5px solid var(--lesson); transition: transform .15s, box-shadow .15s; }
+.wx-dest a:hover { transform: translateY(-3px); }
+.wx-no { position: absolute; right: 1rem; top: .7rem; font-size: 2.2rem; font-weight: 900; color: color-mix(in srgb, var(--lesson) 30%, transparent); line-height: 1; }
+.wx-yrs { font-size: var(--fs-0); font-weight: 700; color: var(--lesson); }
+.wx-dest h3 { font-size: var(--fs-3); padding-right: 2.5rem; }
+.wx-sub { font-size: var(--fs-1); color: var(--ink-2); }
+.wx-from { font-size: var(--fs-0); color: var(--muted); margin-top: auto; padding-top: .4rem; }
+.wx-bar { position: relative; display: block; height: 6px; border-radius: 3px; background: var(--paper-2); }
+.wx-bar i { position: absolute; top: 0; bottom: 0; border-radius: 3px; background: var(--lesson); }
+.wx-go { font-size: var(--fs-0); font-weight: 700; color: var(--wx-teal); }
+
+/* 带走什么 */
+.wx-keys { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: .9rem; }
+.wx-keys li { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1rem 1.1rem; font-size: var(--fs-1); line-height: 1.7; }
+.wx-k { display: inline-grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; font-weight: 900; color: #fff; background: var(--wx-teal); margin-bottom: .5rem; }
+.wx-keys li:nth-child(even) .wx-k { background: var(--wx-amber); }
+:root[data-theme="dark"] .wx-k { color: #081a1c; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .wx-k { color: #081a1c; } }
+
+/* 叙述：章节胶囊导航 + 左侧"航线" */
+.wx-chnav { position: sticky; top: 3.1rem; z-index: 5; display: flex; gap: .4rem; overflow-x: auto; scrollbar-width: none; padding: .5rem 0; margin-bottom: 1rem; background: color-mix(in srgb, var(--paper) 92%, transparent); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.wx-chnav::-webkit-scrollbar { display: none; }
+.wx-chnav button { flex: none; white-space: nowrap; border: 1px solid var(--line); background: var(--card); border-radius: 99px; padding: .3rem .8rem .3rem .35rem; font-size: var(--fs-0); cursor: pointer; }
+.wx-chnav button:hover { border-color: var(--wx-teal); }
+.wx-chnav b { display: inline-grid; place-items: center; width: 1.4rem; height: 1.4rem; border-radius: 50%; background: var(--wx-teal); color: var(--card); margin-right: .4rem; font-size: .75rem; }
+.wx-chs { position: relative; padding-left: 2.6rem; }
+.wx-chs::before { content: ""; position: absolute; left: .95rem; top: .5rem; bottom: .5rem; border-left: 3px dashed color-mix(in srgb, var(--wx-teal) 45%, transparent); }
+.wx-ch { position: relative; max-width: 44rem; background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.3rem 1.4rem 1.4rem; font-family: var(--f-serif); }
+.wx-ch + .wx-ch { margin-top: 1.5rem; }
+.world-story .chapter + .chapter { margin-top: 1.5rem; }
+.wx-pin { position: absolute; left: -2.6rem; top: 1.1rem; width: 2rem; height: 2rem; border-radius: 50%; background: var(--wx-amber); color: #fff; font: 800 .85rem var(--f-sans); display: grid; place-items: center; box-shadow: 0 0 0 4px var(--paper); }
+.wx-ch .ch-meta { font-family: var(--f-sans); }
+.wx-yr { display: inline-block; font-weight: 700; font-size: var(--fs-0); color: var(--wx-teal); background: color-mix(in srgb, var(--wx-teal) 12%, transparent); border-radius: 99px; padding: .1rem .6rem; }
+.wx-ch h2 { font-family: var(--f-sans); font-size: var(--fs-4); margin: .4rem 0 .8rem; }
+.wx-ch .body p:first-child::first-letter { color: var(--wx-teal); }
+.wx-fact { margin-top: 1.2rem; padding: .9rem 1.1rem; border-radius: 10px; font-family: var(--f-sans); font-size: var(--fs-1); background: color-mix(in srgb, var(--wx-amber) 11%, var(--card)); border-left: 4px solid var(--wx-amber); }
+.wx-fact .tag { display: block; color: var(--wx-amber); margin-bottom: .2rem; }
+.wx-fact cite { display: block; font-style: normal; font-size: var(--fs-0); color: var(--muted); margin-top: .4rem; }
+
+/* 同一时期的世界：地区筛选 + 横向时间带 */
+.wx-filter { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: .9rem; }
+.wx-filter button { border: 1.5px solid color-mix(in srgb, var(--c) 55%, transparent); color: var(--c); background: var(--card); border-radius: 99px; padding: .25rem .8rem; font-size: var(--fs-0); font-weight: 700; cursor: pointer; }
+.wx-filter button[aria-pressed="true"] { background: var(--c); color: var(--card); border-color: var(--c); }
+.wx-strip { list-style: none; margin: 0; padding: 1.4rem .25rem 1rem; display: flex; gap: .9rem; overflow-x: auto; scroll-snap-type: x mandatory; position: relative; overscroll-behavior-x: contain; }
+.wx-ev { --c: var(--rg-gl); position: relative; flex: 0 0 min(15rem, 78vw); scroll-snap-align: start; background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.3rem 1rem 1rem; border-top: 4px solid var(--c); }
+.wx-ev[hidden] { display: none; }
+.wx-dot { position: absolute; top: -1rem; left: 1rem; width: .9rem; height: .9rem; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 3px var(--paper); }
+.wx-ev .lat { font-size: 1.7rem; color: var(--c); line-height: 1; }
+.wx-rg { display: inline-block; margin-left: .45rem; font-size: .72rem; font-weight: 700; color: var(--c); background: color-mix(in srgb, var(--c) 13%, transparent); border-radius: 99px; padding: .05rem .5rem; vertical-align: .35rem; }
+.wx-ev p { margin-top: .5rem; font-size: var(--fs-1); line-height: 1.65; color: var(--ink-2); }
+.rg-cn { --c: var(--rg-cn); } .rg-eu { --c: var(--rg-eu); } .rg-am { --c: var(--rg-am); } .rg-me { --c: var(--rg-me); }
+.rg-sa { --c: var(--rg-sa); } .rg-ea { --c: var(--rg-ea); } .rg-gl { --c: var(--rg-gl); }
+
+/* 两种解读：标签页 */
+.wx-tabs { display: flex; gap: .4rem; flex-wrap: wrap; }
+.wx-tabs [role="tab"] { border: 0; border-radius: 12px 12px 0 0; padding: .6rem 1.1rem; font-weight: 800; font-size: var(--fs-1); background: var(--paper-2); color: var(--ink-2); cursor: pointer; }
+.wx-tabs [aria-selected="true"] { background: var(--c); color: var(--card); }
+:where(.wx-filter button, .wx-tabs [role="tab"]) { --c: var(--wx-teal); }
+.v-west { --c: var(--v-west); } .v-china { --c: var(--v-cn); }
+.wx .world-views { display: block; }
+.wx .world-view { background: var(--card); border-radius: 0 var(--radius) var(--radius) var(--radius); box-shadow: var(--shadow); padding: 1.3rem; border-top: 4px solid var(--c, var(--wx-teal)); }
+.wx-frame { font-size: var(--fs-1); line-height: 1.7; padding: .8rem 1rem; border-radius: 10px; background: color-mix(in srgb, var(--c, var(--wx-teal)) 9%, transparent); }
+.wx-frame .tag { display: block; color: var(--c); margin-bottom: .2rem; }
+.wx-points { list-style: none; margin: 1.1rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); gap: .9rem; }
+.wx-points li { position: relative; border: 1px solid var(--line); border-radius: 12px; padding: .9rem 1rem .9rem 3.1rem; }
+.wx-pn { position: absolute; left: .9rem; top: .9rem; width: 1.6rem; height: 1.6rem; border-radius: 8px; display: grid; place-items: center; font-weight: 900; font-size: .8rem; background: var(--c); color: var(--card); }
+.wx-points h4 { font-size: var(--fs-2); }
+.wx-points p { font-size: var(--fs-1); line-height: 1.7; color: var(--ink-2); margin-top: .3rem; }
+.wx .world-src { margin-top: 1.1rem; font-size: var(--fs-1); }
+.wx .world-src summary { cursor: pointer; color: var(--c, var(--wx-teal)); font-weight: 700; }
+.wx .world-src .reading { margin-top: .6rem; }
+
+/* 三种讲法一览：每个问题一张卡，三栏彩色 */
+.wx-cmp { display: grid; gap: 1rem; }
+.wx-row { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1rem 1.1rem 1.1rem; }
+.wx-row h3 { font-size: var(--fs-3); margin-bottom: .7rem; }
+.wx-cells { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: .7rem; }
+.wx-cell { --c: var(--wx-teal); border-radius: 10px; padding: .7rem .85rem; background: color-mix(in srgb, var(--c) 8%, transparent); border-left: 4px solid var(--c); }
+.wx-cell .tag { color: var(--c); }
+.wx-cell p { margin-top: .25rem; font-size: var(--fs-1); line-height: 1.65; }
+.c-lesson { --c: var(--ink-2); } .c-west { --c: var(--v-west); } .c-cn { --c: var(--v-cn); }
+
+/* 对照 */
+.wx.view .world-contrast { background: linear-gradient(160deg, color-mix(in srgb, var(--wx-teal) 10%, var(--card)), var(--card)); border-radius: calc(var(--radius) + 4px); padding: 1.4rem clamp(1rem, 3vw, 1.8rem) 1.6rem; box-shadow: var(--shadow); }
+.wx-ad { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr)); gap: 1rem; }
+.wx-ad > div { border-radius: 12px; padding: 1rem 1.1rem; background: var(--card); border: 1px solid var(--line); }
+.wx-ad h3 { font-size: var(--fs-2); }
+.wx-agree h3 { color: var(--ok); } .wx-differ h3 { color: var(--wx-amber); }
+.wx-agree { border-top: 4px solid var(--ok) !important; } .wx-differ { border-top: 4px solid var(--wx-amber) !important; }
+.wx-ad ul { margin: .5rem 0 0; padding-left: 1.15em; font-size: var(--fs-1); line-height: 1.7; color: var(--ink-2); }
+.wx-ad li + li { margin-top: .35rem; }
+.wx-qh { font-size: var(--fs-3); margin: 1.5rem 0 .7rem; }
+.wx-qs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); gap: .8rem; }
+.wx-qs li { position: relative; background: var(--card); border-radius: 16px 16px 16px 4px; padding: .9rem 1rem .9rem 3.2rem; border: 1px solid var(--line); }
+.wx-qs .lat { position: absolute; left: .9rem; top: .7rem; font-size: 1.4rem; color: var(--wx-teal); }
+.wx-qs p { font-size: var(--fs-1); line-height: 1.7; }
+
+/* 关键词翻卡：两面叠在同一格，高度取较高的一面 */
+.wx-flips { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr)); gap: .9rem; }
+.wx-flip { display: grid; width: 100%; height: 100%; padding: 0; border: 0; background: none; cursor: pointer; text-align: left; perspective: 900px; }
+.wx-face { grid-area: 1 / 1; display: flex; flex-direction: column; gap: .3rem; min-height: 8.5rem; padding: 1rem 1.1rem; border-radius: var(--radius); box-shadow: var(--shadow); backface-visibility: hidden; -webkit-backface-visibility: hidden; transition: transform .45s ease; font-size: var(--fs-1); line-height: 1.65; }
+.wx-front { background: linear-gradient(140deg, var(--wx-teal), color-mix(in srgb, var(--wx-teal) 55%, var(--wx-deep))); color: #fff; justify-content: center; }
+.wx-front b { font-size: var(--fs-3); }
+.wx-front .lat { opacity: .85; }
+.wx-front i { font-style: normal; font-size: var(--fs-0); opacity: .75; margin-top: .4rem; }
+.wx-back { background: var(--card); color: var(--ink-2); transform: rotateY(180deg); border: 1px solid var(--line); }
+.wx-back b { color: var(--wx-teal); }
+.wx-flip[aria-pressed="true"] .wx-front { transform: rotateY(-180deg); }
+.wx-flip[aria-pressed="true"] .wx-back { transform: rotateY(0); }
+:root[data-theme="dark"] .wx-front { color: #04201f; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .wx-front { color: #04201f; } }
+
+/* 待核 */
+.wx-notes { background: var(--card); border-radius: var(--radius); border: 1px dashed var(--line); padding: .8rem 1.1rem; font-size: var(--fs-1); }
+.wx-notes summary { cursor: pointer; font-weight: 800; color: var(--wx-amber); }
+.wx-notes summary span { font-weight: 400; color: var(--muted); font-size: var(--fs-0); margin-left: .6rem; }
+.wx-notes ul { margin: .6rem 0 0; padding-left: 1.15em; line-height: 1.7; color: var(--ink-2); }
+
+@media (prefers-reduced-motion: reduce) {
+  .wx-face, .wx-dest a, .wx-seg { transition: none; }
+}
+
+/* 课程页底部的入口卡：用世界史的配色，提示这是另一个板块 */
+.world-link { display: block; text-decoration: none; max-width: var(--measure); border-radius: 14px; padding: 1.1rem 1.3rem; color: #f2fbf9; font-family: var(--f-sans);
+  background: repeating-linear-gradient(90deg, rgb(255 255 255 / .06) 0 1px, transparent 1px 36px), linear-gradient(135deg, #0a4f55, #0b3140); transition: transform .15s; }
+.world-link:hover { transform: translateY(-2px); }
+.world-link .eyebrow { color: #ffd48a; }
+.world-link strong { display: block; font-size: var(--fs-3); margin: .2rem 0; }
+.world-link span:last-child { font-size: var(--fs-1); color: #bfeee6; }

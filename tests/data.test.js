@@ -162,3 +162,43 @@ test('导论：两千年一览', () => {
     assert.deepStrictEqual(ys, ys.slice().sort((a, b) => a - b), `${era.name}：代表事件年份不是递增的 ${ys.join(', ')}`);
   }
 });
+
+// 世界史视角：每篇对应一个存在的课，两种讲法、三栏对照、对照框都齐全
+test('世界史视角 data/world-XX.js', () => {
+  const sandbox = { window: {} };
+  vm.createContext(sandbox);
+  const wfiles = fs.readdirSync(DATA).filter(f => /^world-\d+\.js$/.test(f)).sort();
+  for (const f of wfiles) vm.runInContext(fs.readFileSync(path.join(DATA, f), 'utf8'), sandbox, { filename: f });
+  const W = sandbox.window.COURSE_WORLD || [];
+  assert.strictEqual(W.length, wfiles.length, '每个 world 文件恰好注册一篇');
+  const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+  for (const f of wfiles) assert.ok(html.includes(`data/${f}`), `index.html 没有加载 ${f}`);
+  const seen = new Set();
+  for (const w of W) {
+    const L = lessons.find(l => l.id === w.lesson);
+    assert.ok(L, `world 篇目对应的课不存在: ${w.lesson}`);
+    assert.ok(!seen.has(w.lesson), `同一课有两篇世界史: ${w.lesson}`);
+    seen.add(w.lesson);
+    for (const k of ['title', 'summary']) assert.ok(w[k], `${w.lesson} 缺 ${k}`);
+    assert.ok(Array.isArray(w.keyPoints) && w.keyPoints.length, `${w.lesson} 缺 keyPoints`);
+    assert.ok(Array.isArray(w.chapters) && w.chapters.length, `${w.lesson} 缺叙述 chapters`);
+    for (const c of w.chapters) assert.ok(c.id && c.title && Array.isArray(c.body) && c.body.length, `${w.lesson} 叙述章节格式错: ${c.id}`);
+    // 首段首字会被 CSS 做成下沉大字，数字开头（"1517 年…"）会只把一个数字放大，很难看
+    for (const c of w.chapters) assert.ok(!/^[0-9]/.test(c.body[0]), `${w.lesson}/${c.id} 首段不要以数字开头`);
+    // 叙述篇幅约为本课正文的 1/3：太短讲不清，太长就喧宾夺主
+    const len = cs => cs.reduce((n, c) => n + c.body.join('').length, 0);
+    const ratio = len(w.chapters) / len(L.chapters);
+    assert.ok(ratio >= 0.2 && ratio <= 0.5, `${w.lesson} 叙述篇幅是本课的 ${ratio.toFixed(2)}，应在 0.2–0.5 之间`);
+    assert.ok(Array.isArray(w.world) && w.world.length, `${w.lesson} 缺同时期大事`);
+    for (const e of w.world) assert.ok(Number.isInteger(e.year) && e.region && e.text, `${w.lesson} 同时期大事格式错: ${e.text}`);
+    assert.ok(Array.isArray(w.views) && w.views.length >= 2, `${w.lesson} 至少两种讲法`);
+    for (const v of w.views) {
+      assert.ok(v.id && v.label && v.frame, `${w.lesson} 讲法缺 id/label/frame`);
+      assert.ok(v.points.length && v.points.every(p => p.title && p.body), `${w.lesson}/${v.id} 要点格式错`);
+      assert.ok(v.sources.length && v.sources.every(s => s.title), `${w.lesson}/${v.id} 缺代表著作`);
+    }
+    assert.ok(w.table && w.table.rows.length, `${w.lesson} 缺对照表`);
+    for (const r of w.table.rows) assert.strictEqual(r.cells.length, w.table.columns.length, `${w.lesson} 对照表「${r.topic}」列数不对`);
+    for (const k of ['agree', 'differ', 'questions']) assert.ok(w.contrast && w.contrast[k] && w.contrast[k].length, `${w.lesson} 对照框缺 ${k}`);
+  }
+});

@@ -88,3 +88,18 @@ test('mergePlaces 按 id 去重并记录所属课程', () => {
   assert.strictEqual(m.length, 2);
   assert.deepStrictEqual(m[0].lessons.map(l => l.id), ['A', 'B']);
 });
+
+test('regionKeys 把地区归组，多地区去重，未知算全球', () => {
+  assert.deepStrictEqual(U.regionKeys('中国'), ['cn']);
+  assert.deepStrictEqual(U.regionKeys('中国 / 罗马'), ['cn', 'eu']);
+  assert.deepStrictEqual(U.regionKeys('英国 / 欧洲'), ['eu']);
+  assert.deepStrictEqual(U.regionKeys('欧亚'), ['gl']);
+  assert.deepStrictEqual(U.regionKeys(''), ['gl']);
+});
+
+test('laneRows 让重叠的时间段分行', () => {
+  assert.deepStrictEqual(U.laneRows([[30, 313], [30, 367], [312, 500], [451, 1054]]), [0, 1, 2, 0]);
+  assert.deepStrictEqual(U.laneRows([[1483, 1546], [1525, 1892], [1550, 1701]]), [0, 1, 0]);
+  // 设了最短长度：1483 起算 130 年到 1613，1550 就放不进第 0 行
+  assert.deepStrictEqual(U.laneRows([[1483, 1546], [1525, 1892], [1550, 1701]], 130), [0, 1, 2]);
+});
