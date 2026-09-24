@@ -80,18 +80,33 @@ const WIDS = [...fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8').matchAll
 });
 await run('世界史视角', 1280, async page => {
   await page.goto(URL0 + '#world');
-  await page.waitForSelector('.world .ov-list');
-  if ((await page.$$('.world .ov-list li')).length !== IDS.length) throw new Error('目录不是每课一行');
+  await page.waitForSelector('.wx-dests');
+  if ((await page.$$('.wx-dest')).length !== WIDS.length) throw new Error('目录卡片数和篇数不符');
+  if ((await page.$$('.wx-seg')).length !== WIDS.length) throw new Error('时间长河段数和篇数不符');
+  if (await page.evaluate(() => document.documentElement.dataset.section) !== 'world') throw new Error('世界史页面没有切换主题');
   for (const id of WIDS) {
     await page.goto(URL0 + '#world/' + id);
     await page.waitForSelector('.world-views');
     if (!(await page.$('.world-story .chapter'))) throw new Error(`${id}: 没有叙述章节`);
     if ((await page.$$('.world-view')).length < 2) throw new Error(`${id}: 讲法少于两种`);
     if (!(await page.$('.world-contrast'))) throw new Error(`${id}: 没有对照框`);
+    // 标签页：点第二个，第二个面板显示、第一个隐藏
+    await page.click('.wx-tabs [role="tab"]:nth-child(2)');
+    if (await page.$eval('.world-view:nth-of-type(1)', e => !e.hidden)) throw new Error(`${id}: 标签页没有切换`);
+    // 地区筛选：点第一个地区，剩下的卡片都属于该地区
+    const rg = await page.$eval('.wx-filter [data-rg]:not([data-rg=""])', b => b.dataset.rg);
+    await page.click(`.wx-filter [data-rg="${rg}"]`);
+    const bad = await page.$$eval('.wx-ev:not([hidden])', (lis, rg) => lis.filter(li => !li.dataset.rg.split(' ').includes(rg)).length, rg);
+    if (bad || !(await page.$('.wx-ev:not([hidden])'))) throw new Error(`${id}: 地区筛选不对`);
+    await page.click('.wx-filter [data-rg=""]');
+    // 翻卡
+    await page.click('.wx-flip');
+    if (await page.$eval('.wx-flip', b => b.getAttribute('aria-pressed')) !== 'true') throw new Error(`${id}: 关键词卡翻不过来`);
     await shot(page, 'world-' + id + '-full', true);
     // 课程页上有入口
     await page.goto(URL0 + '#' + id);
     await page.waitForSelector(`.world-link[href="#world/${id}"]`);
+    if (await page.evaluate(() => document.documentElement.dataset.section)) throw new Error('离开世界史后主题没有恢复');
   }
 });
 
@@ -114,6 +129,14 @@ await run('手机宽度无横向滚动', 390, async page => {
     const over = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     if (over > 1) throw new Error(`${h || '首页'} 页面横向溢出 ${over}px`);
   }
+  // 时间长河：窄屏上同一行的段不能互相压住
+  await page.goto(URL0 + '#world');
+  await page.waitForSelector('.wx-seg');
+  const segOverlap = await page.$$eval('.wx-seg', as => {
+    const r = as.map(a => a.getBoundingClientRect());
+    return r.some((x, i) => r.some((y, j) => j > i && x.top === y.top && x.left < y.right - 1 && y.left < x.right - 1));
+  });
+  if (segOverlap) throw new Error('时间长河在手机宽度下有重叠');
   await page.goto(URL0 + '#england');
   await shot(page, 'mobile-england');
 });

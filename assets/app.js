@@ -21,6 +21,34 @@
       }
       return a;
     },
+    // 世界史"同一时期"：把地区文字（如"中国 / 欧洲"）归到几个颜色组，供上色和筛选
+    WORLD_REGIONS: [
+      ['cn', '中国', ['中国']],
+      ['eu', '欧洲', ['欧洲', '英国', '罗马', '罗斯', '俄国']],
+      ['am', '美洲', ['美洲', '北美', '美国']],
+      ['me', '中东·中亚', ['西亚', '中东', '阿拉伯', '中亚']],
+      ['sa', '南亚·东南亚', ['南亚', '东南亚', '印度洋']],
+      ['ea', '日本·朝鲜·蒙古', ['日本', '朝鲜', '蒙古']],
+      ['gl', '全球', []],
+    ],
+    regionKeys(region) {
+      const keys = String(region || '').split('/').map(t => t.trim()).filter(Boolean).map(t => {
+        const hit = Util.WORLD_REGIONS.find(([, , words]) => words.includes(t));
+        return hit ? hit[0] : 'gl'; // 没列出的（全球、亚洲、欧亚……）都算"全球"
+      });
+      return keys.length ? [...new Set(keys)] : ['gl'];
+    },
+    // 时间段排行：每段放进第一条放得下的行（首尾不重叠），返回各段的行号
+    // minLen：短时段在屏幕上有最小宽度，按至少这么长来排，免得窄屏上挤在一起
+    laneRows(spans, minLen = 0) {
+      const ends = [];
+      return spans.map(([a, b]) => {
+        let r = ends.findIndex(e => e < a);
+        if (r < 0) r = ends.length;
+        ends[r] = Math.max(b, a + minLen);
+        return r;
+      });
+    },
     // 排序题：返回每个位置是否正确
     checkOrder(items) {
       const sorted = items.slice().sort((x, y) => x.year - y.year);
@@ -191,6 +219,8 @@
     }
     else { renderHome(main); document.title = SITE; }
     markNav(id);
+    if (id === 'world' || id.startsWith('world/')) document.documentElement.dataset.section = 'world';
+    else delete document.documentElement.dataset.section;
     window.scrollTo(0, 0);
   }
 
@@ -347,27 +377,53 @@
 
   /* ================= 世界史视角（辅助板块） ================= */
   // 独立于课文：转述世俗史学的讲法，最后用"对照"框和本课比较。正文不做护教式反驳。
+  // 视觉上和课文刻意不同（"地图探索"风格，见 style.css 的 [data-section="world"]），让人一眼知道这是辅助板块。
+  const WX_SPAN = [0, 2000]; // 目录页"时间长河"的刻度范围
+  const wxPct = y => ((y - WX_SPAN[0]) / (WX_SPAN[1] - WX_SPAN[0]) * 100).toFixed(2);
+  const lessonStyle = L => `--lesson-raw:${esc(L.accent)}`;
+  // 装饰用的地球经纬线，aria-hidden
+  const WX_GLOBE = `<svg class="wx-globe" viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="92"/><ellipse cx="100" cy="100" rx="40" ry="92"/><ellipse cx="100" cy="100" rx="74" ry="92"/><line x1="100" y1="8" x2="100" y2="192"/><ellipse cx="100" cy="100" rx="92" ry="30"/><ellipse cx="100" cy="100" rx="92" ry="62"/><line x1="8" y1="100" x2="192" y2="100"/></svg>`;
+  const WX_NOTE = '这里转述的是世俗史学的讲法，不代表本课程立场；教材观点是转述大意，不是原文。';
+
   function renderWorldIndex(main) {
-    const v = el(`<div class="view world">
-      <header class="ov-head">
-        <p class="eyebrow">辅助板块</p>
-        <h1>世界史视角</h1>
-        <p class="ov-sub">世人怎样讲同一段历史</p>
-        <p class="lede">本课程是教会史，从信仰出发讲神怎样保守祂的教会。这个板块换一个角度：世界通史（西方学界主流和国内高校教材）怎样描述、解读同一段历史。每篇对应一课，最后有一个「对照」框，供小组讨论。</p>
+    const riverRows = Util.laneRows(LESSONS.filter(worldOf).map(L => L.years), 130); // 130 年 ≈ 手机宽度下一个编号的宽度
+    const v = el(`<div class="view world wx">
+      <header class="wx-hero">
+        ${WX_GLOBE}
+        <p class="wx-kicker">辅助板块 · 世界史视角</p>
+        <h1>换一副眼镜，看同一段历史</h1>
+        <p class="wx-lede">本课程是教会史，从信仰出发讲神怎样保守祂的教会。这个板块换一个角度：世界通史——西方学界主流和国内高校教材——怎样描述、解读同一段历史。每篇对应一课，最后有一个「对照」框，供小组讨论。</p>
+        <div class="wx-stats">
+          <span><b>${WORLD.length}</b>篇</span>
+          <span><b>${WORLD.reduce((n, w) => n + w.world.length, 0)}</b>件同期大事</span>
+          <span><b>2</b>种解读</span>
+        </div>
       </header>
-      <aside class="hl note world-disclaimer"><span class="tag">说明</span>这里转述的是世俗史学的观点，不代表本课程立场；教材观点是转述大意，不是原文。</aside>
+      <p class="wx-note">${WX_NOTE}</p>
+
       <section class="block">
-        <div class="block-head"><h2>各课对应篇目</h2><span class="aside">已写 ${WORLD.length} / ${LESSONS.length} 篇</span></div>
-        <ol class="ov-list">
-          ${LESSONS.map(L => {
+        <div class="wx-head"><h2>两千年时间长河</h2><span>点一段，直接进入那一篇</span></div>
+        <nav class="wx-river" aria-label="按年代选篇" style="--rows:${Math.max(...riverRows) + 1}">
+          ${LESSONS.filter(worldOf).map((L, i) => `<a class="wx-seg" href="#world/${esc(L.id)}" style="${lessonStyle(L)};left:${wxPct(L.years[0])}%;width:max(${(wxPct(L.years[1]) - wxPct(L.years[0])).toFixed(2)}%,1.5rem);--row:${riverRows[i]}" title="第 ${L.no} 课 · ${esc(worldOf(L).title)}（${L.years[0]}–${L.years[1]}）"><span>${L.no}</span></a>`).join('')}
+          <div class="wx-axis" aria-hidden="true">${[0, 500, 1000, 1500, 2000].map(y => `<span style="left:${wxPct(y)}%">${y}</span>`).join('')}</div>
+        </nav>
+      </section>
+
+      <section class="block">
+        <div class="wx-head"><h2>十三站</h2><span>每一站对应课程的一课</span></div>
+        <ol class="wx-dests">
+          ${LESSONS.filter(worldOf).map(L => {
             const W = worldOf(L);
-            return `<li style="${accentStyle(L)}" class="${W ? '' : 'pending'}">
-              <span class="ov-year">${L.no}</span>
-              <div>
-                <p class="ov-lesson">第 ${L.no} 课 · ${esc(L.title)} · ${L.years[0]}–${L.years[1]}</p>
-                <h3>${W ? esc(W.title) : '撰写中'}</h3>
-                ${W ? `<p>${esc(W.summary)}</p><a class="ov-go" href="#world/${esc(L.id)}">阅读 →</a>` : ''}
-              </div>
+            return `<li class="wx-dest" style="${lessonStyle(L)}">
+              <a href="#world/${esc(L.id)}">
+                <span class="wx-no">${L.no}</span>
+                <span class="wx-yrs">${L.years[0]}–${L.years[1]}</span>
+                <h3>${esc(W.title)}</h3>
+                ${W.subtitle ? `<p class="wx-sub">${esc(W.subtitle)}</p>` : ''}
+                <p class="wx-from">对应第 ${L.no} 课 · ${esc(L.title)}</p>
+                <span class="wx-bar" aria-hidden="true"><i style="left:${wxPct(L.years[0])}%;width:max(${(wxPct(L.years[1]) - wxPct(L.years[0])).toFixed(2)}%,4px)"></i></span>
+                <span class="wx-go">出发 →</span>
+              </a>
             </li>`;
           }).join('')}
         </ol>
@@ -377,63 +433,128 @@
   }
 
   function renderWorld(main, L, W) {
-    const v = el(`<div class="view world" style="${accentStyle(L)}">
-      <header class="ov-head">
-        <p class="eyebrow">世界史视角 · 对应第 ${L.no} 课</p>
+    const regionsUsed = Util.WORLD_REGIONS.filter(([k]) => W.world.some(e => Util.regionKeys(e.region).includes(k)));
+    const colCls = ['c-lesson', 'c-west', 'c-cn']; // 对照表三栏：本课 / 西方学界 / 国内教材
+    const idx = W.chapters.length > 1;
+    const v = el(`<div class="view world wx" style="${lessonStyle(L)}">
+      <header class="wx-hero">
+        ${WX_GLOBE}
+        <p class="wx-kicker">世界史视角 · 对应第 ${L.no} 课</p>
         <h1>${esc(W.title)}</h1>
-        ${W.subtitle ? `<p class="ov-sub">${esc(W.subtitle)}</p>` : ''}
-        <p class="lede">${esc(W.summary)}</p>
-        <div class="btn-row" style="margin-top:1.25rem"><a class="btn ghost" href="#${esc(L.id)}">← 回到第 ${L.no} 课：${esc(L.title)}</a><a class="btn ghost" href="#world">全部篇目</a></div>
+        ${W.subtitle ? `<p class="wx-subtitle">${esc(W.subtitle)}</p>` : ''}
+        <p class="wx-lede">${esc(W.summary)}</p>
+        <div class="wx-stats">
+          ${W.years ? `<span><b>${W.years[0]}–${W.years[1]}</b></span>` : ''}
+          <span><b>${W.world.length}</b>件同期大事</span>
+          <span><b>${regionsUsed.length}</b>个地区</span>
+          <span><b>${W.views.length}</b>种解读</span>
+        </div>
+        <div class="btn-row wx-btns"><a class="btn" href="#${esc(L.id)}">← 回到第 ${L.no} 课</a><a class="btn ghost" href="#world">全部篇目</a></div>
       </header>
-      <aside class="hl note world-disclaimer"><span class="tag">说明</span>这一页转述世俗史学的讲法，不代表本课程立场；与本课的异同放在最后的「对照」框里。</aside>
-      <section class="keypoints"><h2>带走什么</h2><ol>${W.keyPoints.map(k => `<li>${esc(k)}</li>`).join('')}</ol></section>
+      <p class="wx-note">${WX_NOTE}与本课的异同放在最后的「对照」里。</p>
+
+      <section class="block">
+        <div class="wx-head"><h2>带走什么</h2></div>
+        <ol class="wx-keys">${W.keyPoints.map((k, i) => `<li><span class="wx-k">${i + 1}</span><p>${esc(k)}</p></li>`).join('')}</ol>
+      </section>
 
       <section class="block world-story">
-        <div class="block-head"><h2>世界史怎么讲</h2><span class="aside">按世界通史的叙述，约为本课篇幅的三分之一</span></div>
-        ${W.chapters.map((c, i) => `<article class="chapter" id="wch-${esc(c.id)}">
-          <div class="ch-meta"><span class="lat">${['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'][i] || i + 1}</span>${c.years ? `<span>${esc(c.years)}</span>` : ''}</div>
+        <div class="wx-head"><h2>世界史怎么讲</h2><span>按世界通史的叙述，约为本课篇幅的三分之一</span></div>
+        ${idx ? `<nav class="wx-chnav" aria-label="章节">${W.chapters.map((c, i) => `<button type="button" data-go="wch-${esc(c.id)}"><b>${i + 1}</b>${esc(c.title)}</button>`).join('')}</nav>` : ''}
+        <div class="wx-chs">
+        ${W.chapters.map((c, i) => `<article class="chapter wx-ch" id="wch-${esc(c.id)}">
+          <div class="wx-pin" aria-hidden="true">${i + 1}</div>
+          <div class="ch-meta">${c.years ? `<span class="wx-yr">${esc(c.years)}</span>` : ''}</div>
           <h2>${esc(c.title)}</h2>
           <div class="body">${c.body.map(t => `<p>${esc(t)}</p>`).join('')}</div>
-          ${c.highlight ? `<aside class="hl ${esc(c.highlight.type || 'note')}">${c.highlight.type === 'quote' ? '' : `<span class="tag">${c.highlight.type === 'fact' ? '史实' : '批注'}</span>`}${esc(c.highlight.text)}${c.highlight.source ? `<cite>—— ${esc(c.highlight.source)}</cite>` : ''}</aside>` : ''}
+          ${c.highlight ? `<aside class="wx-fact"><span class="tag">${c.highlight.type === 'fact' ? '同一时刻' : '批注'}</span>${esc(c.highlight.text)}${c.highlight.source ? `<cite>—— ${esc(c.highlight.source)}</cite>` : ''}</aside>` : ''}
         </article>`).join('')}
+        </div>
       </section>
 
       <section class="block">
-        <div class="block-head"><h2>同一时期的世界</h2><span class="aside">${W.years ? `${W.years[0]}–${W.years[1]} 前后` : ''}</span></div>
-        <ol class="world-tl">${W.world.map(e => `<li><span class="lat">${e.year}</span><span class="rg">${esc(e.region)}</span><p>${esc(e.text)}</p></li>`).join('')}</ol>
+        <div class="wx-head"><h2>同一时期的世界</h2><span>左右滑动；点地区只看那里</span></div>
+        <div class="wx-filter" role="group" aria-label="按地区筛选">
+          <button type="button" data-rg="" aria-pressed="true">全部</button>
+          ${regionsUsed.map(([k, label]) => `<button type="button" class="rg-${k}" data-rg="${k}" aria-pressed="false">${esc(label)}</button>`).join('')}
+        </div>
+        <ol class="wx-strip">${W.world.map(e => {
+          const ks = Util.regionKeys(e.region);
+          return `<li class="wx-ev rg-${ks[0]}" data-rg="${ks.join(' ')}"><span class="wx-dot" aria-hidden="true"></span><span class="lat">${e.year}</span><span class="wx-rg">${esc(e.region)}</span><p>${esc(e.text)}</p></li>`;
+        }).join('')}</ol>
       </section>
 
       <section class="block">
-        <div class="block-head"><h2>两种解读</h2><span class="aside">同样的史实，不同的解释框架</span></div>
+        <div class="wx-head"><h2>两种解读</h2><span>同样的史实，不同的解释框架</span></div>
+        <div class="wx-tabs" role="tablist">
+          ${W.views.map((vw, i) => `<button type="button" role="tab" id="wxt-${esc(vw.id)}" class="v-${esc(vw.id)}" aria-controls="wxp-${esc(vw.id)}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}">${esc(vw.label)}</button>`).join('')}
+        </div>
         <div class="world-views">
-          ${W.views.map(vw => `<article class="world-view">
-            <h3>${esc(vw.label)}</h3>
-            <p class="frame">${esc(vw.frame)}</p>
-            ${vw.points.map(pt => `<h4>${esc(pt.title)}</h4><p>${esc(pt.body)}</p>`).join('')}
-            <details class="world-src"><summary>代表著作</summary><ul class="reading">${vw.sources.map(r => `<li><div>${esc(r.title)}</div><div class="au">${esc(r.author || '')}</div>${r.note ? `<div class="nt">${esc(r.note)}</div>` : ''}</li>`).join('')}</ul></details>
+          ${W.views.map((vw, i) => `<article class="world-view v-${esc(vw.id)}" role="tabpanel" id="wxp-${esc(vw.id)}" aria-labelledby="wxt-${esc(vw.id)}" ${i === 0 ? '' : 'hidden'}>
+            <p class="wx-frame"><span class="tag">解释框架</span>${esc(vw.frame)}</p>
+            <ol class="wx-points">${vw.points.map((pt, j) => `<li><span class="wx-pn">${j + 1}</span><h4>${esc(pt.title)}</h4><p>${esc(pt.body)}</p></li>`).join('')}</ol>
+            <details class="world-src"><summary>代表著作 · ${vw.sources.length} 种</summary><ul class="reading">${vw.sources.map(r => `<li><div>${esc(r.title)}</div><div class="au">${esc(r.author || '')}</div>${r.note ? `<div class="nt">${esc(r.note)}</div>` : ''}</li>`).join('')}</ul></details>
           </article>`).join('')}
         </div>
       </section>
 
       <section class="block">
-        <div class="block-head"><h2>三种讲法一览</h2></div>
-        <div class="cmp-wrap"><table class="cmp world-cmp"><thead><tr><th></th>${W.table.columns.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead>
-          <tbody>${W.table.rows.map(r => `<tr><th scope="row">${esc(r.topic)}</th>${r.cells.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+        <div class="wx-head"><h2>三种讲法一览</h2><span>同一个问题，三种回答</span></div>
+        <div class="wx-cmp world-cmp">
+          ${W.table.rows.map(r => `<div class="wx-row">
+            <h3>${esc(r.topic)}</h3>
+            <div class="wx-cells">${r.cells.map((c, i) => `<div class="wx-cell ${colCls[i] || ''}"><span class="tag">${esc(W.table.columns[i])}</span><p>${esc(c)}</p></div>`).join('')}</div>
+          </div>`).join('')}
+        </div>
       </section>
 
       <section class="block world-contrast">
-        <div class="block-head"><h2>对照</h2><span class="aside">和第 ${L.no} 课放在一起看</span></div>
-        <div class="wc-grid">
-          <div><h3>共识</h3><ul>${W.contrast.agree.map(t => `<li>${esc(t)}</li>`).join('')}</ul></div>
-          <div><h3>分歧</h3><ul>${W.contrast.differ.map(t => `<li>${esc(t)}</li>`).join('')}</ul></div>
+        <div class="wx-head"><h2>对照</h2><span>和第 ${L.no} 课放在一起看</span></div>
+        <div class="wx-ad">
+          <div class="wx-agree"><h3>共识</h3><ul>${W.contrast.agree.map(t => `<li>${esc(t)}</li>`).join('')}</ul></div>
+          <div class="wx-differ"><h3>分歧</h3><ul>${W.contrast.differ.map(t => `<li>${esc(t)}</li>`).join('')}</ul></div>
         </div>
-        <h3>讨论</h3>
-        <ol class="discuss">${W.contrast.questions.map(t => `<li>${esc(t)}</li>`).join('')}</ol>
+        <h3 class="wx-qh">小组讨论</h3>
+        <ol class="wx-qs">${W.contrast.questions.map((t, i) => `<li><span class="lat">Q${i + 1}</span><p>${esc(t)}</p></li>`).join('')}</ol>
       </section>
 
-      ${W.terms && W.terms.length ? `<section class="block"><div class="block-head"><h2>关键词</h2></div><dl class="terms">${W.terms.map(t => `<div><dt>${esc(t.term)}<span class="lat">${esc(t.en || '')}</span></dt><dd>${esc(t.def)}</dd></div>`).join('')}</dl></section>` : ''}
-      ${W.notes && W.notes.length ? `<section class="block"><div class="block-head"><h2>待核</h2></div>${W.notes.map(n => `<p class="src-note"><span class="tag">批注</span>${esc(n)}</p>`).join('')}</section>` : ''}
+      ${W.terms && W.terms.length ? `<section class="block"><div class="wx-head"><h2>关键词</h2><span>点卡片翻面</span></div>
+        <ul class="wx-flips">${W.terms.map(t => `<li><button type="button" class="wx-flip" aria-pressed="false">
+          <span class="wx-face wx-front"><b>${esc(t.term)}</b><span class="lat">${esc(t.en || '')}</span><i>翻面看解释</i></span>
+          <span class="wx-face wx-back"><b>${esc(t.term)}</b>${esc(t.def)}</span>
+        </button></li>`).join('')}</ul></section>` : ''}
+      ${W.notes && W.notes.length ? `<section class="block"><details class="wx-notes"><summary>待核 · ${W.notes.length} 条<span>写作时没有逐页核对原书的地方，引用前请核对</span></summary><ul>${W.notes.map(n => `<li>${esc(n)}</li>`).join('')}</ul></details></section>` : ''}
     </div>`);
+
+    // 章节导航：hash 用于路由，所以用按钮 + scrollIntoView，不用锚点
+    $$('.wx-chnav [data-go]', v).forEach(b => b.onclick = () => document.getElementById(b.dataset.go).scrollIntoView({ behavior: 'smooth', block: 'start' }));
+
+    // 地区筛选
+    const fbtns = $$('.wx-filter button', v);
+    fbtns.forEach(b => b.onclick = () => {
+      fbtns.forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      $$('.wx-ev', v).forEach(li => { li.hidden = !!b.dataset.rg && !li.dataset.rg.split(' ').includes(b.dataset.rg); });
+      $('.wx-strip', v).scrollLeft = 0;
+    });
+
+    // 两种解读：标签页，左右方向键切换
+    const tabs = $$('[role="tab"]', v);
+    const pick = t => tabs.forEach(x => {
+      const on = x === t;
+      x.setAttribute('aria-selected', String(on)); x.tabIndex = on ? 0 : -1;
+      document.getElementById(x.getAttribute('aria-controls')).hidden = !on;
+    });
+    tabs.forEach((t, i) => {
+      t.onclick = () => pick(t);
+      t.onkeydown = e => {
+        const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+        if (d) { const n = tabs[(i + d + tabs.length) % tabs.length]; pick(n); n.focus(); e.preventDefault(); }
+      };
+    });
+
+    // 关键词翻卡
+    $$('.wx-flip', v).forEach(b => b.onclick = () => b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true')));
+
     main.appendChild(v);
   }
 
