@@ -166,6 +166,7 @@
   };
 
   /* ---------- 顶栏 ---------- */
+  // 13 课收进下拉面板，顶栏宽度固定，手机上不用横向滑动
   function renderTopbar() {
     const bar = $('#topbar');
     bar.innerHTML = `
@@ -173,16 +174,36 @@
         <a class="brand" href="#"><span class="lat">H</span> <span class="full">${SITE}</span></a>
         <nav class="nav" aria-label="课程导航">
           ${OVERVIEW ? '<a href="#overview" data-route="overview">导论</a>' : ''}
-          ${LESSONS.map(L => `<a href="#${esc(L.id)}" data-route="${esc(L.id)}">第${CN_NUM[L.no] || L.no}课</a>`).join('')}
+          <div class="nav-dd">
+            <button type="button" class="nav-trigger" id="btn-lessons" aria-expanded="false" aria-controls="panel-lessons"><span class="lbl">课程</span> <span class="caret" aria-hidden="true">▾</span></button>
+            <div class="nav-panel lesson-panel" id="panel-lessons" hidden></div>
+          </div>
           <a href="#review" data-route="review">复习</a>
           ${WORLD.length ? '<a href="#world" data-route="world">世界史</a>' : ''}
-          <button type="button" id="btn-projector" title="放大字号，适合投影">投影</button>
-          <button type="button" id="btn-theme" title="切换深浅色">◐</button>
+          <div class="nav-dd">
+            <button type="button" class="nav-trigger" id="btn-more" aria-expanded="false" aria-controls="panel-more" aria-label="更多设置" title="更多设置">⋯</button>
+            <div class="nav-panel more-panel" id="panel-more" hidden>
+              <button type="button" id="btn-projector" aria-pressed="false">投影模式<small>放大字号</small></button>
+              <button type="button" id="btn-theme">切换深浅色<small>◐</small></button>
+            </div>
+          </div>
         </nav>
       </div>
       <div class="readbar" id="readbar"></div>`;
+    $$('#topbar .nav-trigger').forEach(btn => btn.onclick = e => {
+      e.stopPropagation();
+      const open = btn.getAttribute('aria-expanded') !== 'true';
+      closeNavPanels();
+      if (!open) return;
+      // 每次打开都重画，✓ 反映最新进度
+      if (btn.id === 'btn-lessons') fillLessonPanel();
+      btn.setAttribute('aria-expanded', 'true');
+      $('#' + btn.getAttribute('aria-controls')).hidden = false;
+    });
+    $('#btn-projector').setAttribute('aria-pressed', String(document.documentElement.classList.contains('projector')));
     $('#btn-projector').onclick = () => {
       const on = document.documentElement.classList.toggle('projector');
+      $('#btn-projector').setAttribute('aria-pressed', String(on));
       store.set('projector', on);
     };
     $('#btn-theme').onclick = () => {
@@ -191,6 +212,28 @@
       document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
       store.set('theme', dark ? 'light' : 'dark');
     };
+    // 点面板外或按 Esc 关闭；Esc 后焦点回到按钮，键盘用户不迷路
+    document.addEventListener('click', e => { if (!e.target.closest('.nav-dd')) closeNavPanels(); });
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Escape') return;
+      const btn = $('#topbar .nav-trigger[aria-expanded="true"]');
+      if (btn) { closeNavPanels(); btn.focus(); }
+    });
+  }
+  function fillLessonPanel() {
+    const cur = decodeURIComponent(location.hash.slice(1)).replace(/^world\//, '');
+    // ✓ 只在三项（章节、互动、测验）都完成时出现，和首页书架的 100% 口径一致
+    $('#panel-lessons').innerHTML = LESSONS.map(L => {
+      const done = Util.lessonProgress(L, progress.of(L.id)) >= 1;
+      return `<a href="#${esc(L.id)}" style="${accentStyle(L)}"${L.id === cur ? ' aria-current="page"' : ''}>
+        <span class="no">第${CN_NUM[L.no] || L.no}课${done ? '<span class="ck" title="已学完">✓</span>' : ''}</span>
+        <span class="t">${esc(L.title)}</span></a>`;
+    }).join('');
+    $$('#panel-lessons a').forEach(a => a.onclick = closeNavPanels);
+  }
+  function closeNavPanels() {
+    $$('#topbar .nav-trigger').forEach(b => b.setAttribute('aria-expanded', 'false'));
+    $$('#topbar .nav-panel').forEach(p => { p.hidden = true; });
   }
   function markNav(route) {
     const navKey = route.startsWith('world/') ? 'world' : route;
@@ -198,6 +241,13 @@
       if (a.dataset.route === navKey) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
     });
     const L = byId(route);
+    // 在某一课里时，按钮直接显示"第五课"，一眼知道自己在哪
+    const trig = $('#btn-lessons');
+    if (trig) {
+      $('.lbl', trig).textContent = L ? `第${CN_NUM[L.no] || L.no}课` : '课程';
+      trig.classList.toggle('is-current', !!L);
+    }
+    closeNavPanels();
     document.body.setAttribute('style', L ? accentStyle(L) : '');
   }
 
