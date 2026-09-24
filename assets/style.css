@@ -507,3 +507,9 @@ code { font-size: .9em; background: var(--paper-2); padding: 0 .3em; border-radi
 /* 讲义与其他史料不一致时的小字批注：正文照讲义，这里给另一种说法 */
 .src-note { margin-top: .9rem; font-family: var(--f-sans); font-size: var(--fs-0); color: var(--muted); line-height: 1.6; padding-left: .8rem; border-left: 2px solid var(--line); }
 .src-note .tag { color: var(--accent); margin-right: .4rem; letter-spacing: .08em; }
+/* 章节插图（地图扫描件）：图上文字小，点击在新标签页看原图 */
+.ch-fig { margin: 1.5rem 0 0; }
+.ch-fig a { display: block; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; cursor: zoom-in; }
+.ch-fig img { display: block; width: 100%; height: auto; }
+.ch-fig figcaption { margin-top: .5rem; font-family: var(--f-sans); font-size: var(--fs-0); color: var(--muted); line-height: 1.6; }
+.ch-fig .credit { display: block; opacity: .8; }

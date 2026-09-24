@@ -28,6 +28,7 @@
       highlight: { type: 'quote' | 'fact' | 'note', text: '…', source: '…' },  // 可选
       activity: 'indulgence',           // 可选：在本章后插入的 activity id
       notes: ['另有资料作……']            // 可选：讲义与通行史料不一致时的小字批注（正文照讲义写）
+      figures: [{ src: 'assets/figures/xxx.jpg', caption: '图说', alt: '给读屏软件的描述', credit: '版权' }]  // 可选：插在正文后，点击看大图
     }
   ],
 
@@ -63,3 +64,7 @@
 | `swing` | 王朝更替 / 摇摆 | `title, prompt, leftLabel, rightLabel, steps:[{name, years, value /* -2 天主教 … +2 新教 */, text, policies:[…]}]` |
 | `survey` | 自测：历史上的考题 | `title, prompt, questions:[{q, a}], stat:{text, parts:[{label, value}]}` |
 | `custom` | 引擎内置的特制互动 | `title, widget: 'indulgence' \| 'justification' \| 'churchplan'` |
+
+## 插图
+
+图片放 `assets/figures/`。扫描件先缩到宽 2000px、JPEG 质量 82（每张约 0.5–0.7 MB），不要直接放原图（十几 MB）。`npm test` 会检查 `src` 指向的文件是否存在。

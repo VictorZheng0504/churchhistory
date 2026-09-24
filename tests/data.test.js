@@ -64,6 +64,14 @@ for (const L of lessons) {
         assert.ok(Array.isArray(c.body) && c.body.length > 0, `章节 ${c.id} 没有正文`);
         for (const p of c.body) assert.strictEqual(typeof p, 'string');
         if (c.notes !== undefined) assert.ok(Array.isArray(c.notes) && c.notes.every(n => typeof n === 'string' && n), `章节 ${c.id} 的 notes 须为非空字符串数组`);
+        if (c.figures !== undefined) {
+          assert.ok(Array.isArray(c.figures), `章节 ${c.id} 的 figures 须为数组`);
+          for (const f of c.figures) {
+            assert.ok(f.src && f.caption, `章节 ${c.id} 的插图缺 src/caption`);
+            // 引用的图片必须真的在仓库里，否则网页上是一张裂图
+            assert.ok(fs.existsSync(path.join(__dirname, '..', f.src)), `章节 ${c.id} 的插图不存在: ${f.src}`);
+          }
+        }
       }
     });
 
