@@ -222,12 +222,15 @@
   function fillLessonPanel() {
     // 世界史页面不算"在某一课"，和按钮文字保持一致
     const cur = decodeURIComponent(location.hash.slice(1));
-    // ✓ 只在三项（章节、互动、测验）都完成时出现，和首页书架的 100% 口径一致
+    // 进度口径同首页书架（章节、互动、测验三项平均）：没开始不标，学了一部分显示百分比，全部完成打 ✓
     $('#panel-lessons').innerHTML = LESSONS.map(L => {
-      const done = Util.lessonProgress(L, progress.of(L.id)) >= 1;
+      const p = Util.lessonProgress(L, progress.of(L.id));
+      // 和课内目录一样四舍五入；没学完最多 99%，学了一点最少 1%，免得和 ✓、空白混淆
+      const pct = p > 0 && p < 1 ? Math.min(99, Math.max(1, Math.round(p * 100))) : 0;
+      const mark = p >= 1 ? '<span class="ck" title="已学完">✓</span>' : pct > 0 ? `<span class="pct" title="已完成 ${pct}%">${pct}%</span>` : '';
       return `<a href="#${esc(L.id)}" style="${accentStyle(L)}"${L.id === cur ? ' aria-current="page"' : ''}>
-        <span class="no">第${CN_NUM[L.no] || L.no}课${done ? '<span class="ck" title="已学完">✓</span>' : ''}</span>
-        <span class="t">${esc(L.title)}</span></a>`;
+        <span class="no">第${CN_NUM[L.no] || L.no}课${mark}</span>
+        <span class="t">${esc(L.title)}</span>${p > 0 && p < 1 ? `<i class="bar" aria-hidden="true"><b style="width:${pct}%"></b></i>` : ''}</a>`;
     }).join('');
     $$('#panel-lessons a').forEach(a => a.onclick = closeNavPanels);
   }

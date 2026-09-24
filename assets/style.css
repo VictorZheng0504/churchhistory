@@ -112,6 +112,9 @@ p { margin: 0; }
 .lesson-panel a[aria-current="page"] { background: var(--paper-2); border-color: var(--accent); }
 .lesson-panel .no { display: flex; align-items: center; justify-content: space-between; font-weight: 700; color: var(--accent); }
 .lesson-panel .ck { color: var(--ok); font-weight: 700; }
+.lesson-panel .pct { color: var(--muted); font-weight: 400; font-size: .9em; font-variant-numeric: tabular-nums; }
+.lesson-panel .bar { display: block; height: 3px; margin-top: auto; border-radius: 2px; background: var(--line); overflow: hidden; }
+.lesson-panel .bar b { display: block; height: 100%; background: var(--accent); }
 .lesson-panel .t { color: var(--ink-2); font-size: .95em; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .more-panel { display: flex; flex-direction: column; min-width: 11rem; }
 .more-panel button {
