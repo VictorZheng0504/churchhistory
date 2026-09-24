@@ -175,7 +175,7 @@
         <nav class="nav" aria-label="课程导航">
           ${OVERVIEW ? '<a href="#overview" data-route="overview">导论</a>' : ''}
           <div class="nav-dd">
-            <button type="button" class="nav-trigger" id="btn-lessons" aria-expanded="false" aria-controls="panel-lessons"><span class="lbl">课程</span> <span class="caret" aria-hidden="true">▾</span></button>
+            <button type="button" class="nav-trigger" id="btn-lessons" aria-expanded="false" aria-controls="panel-lessons"><span class="lbl">教会核心课程</span> <span class="caret" aria-hidden="true">▾</span></button>
             <div class="nav-panel lesson-panel" id="panel-lessons" hidden></div>
           </div>
           <a href="#review" data-route="review">复习</a>
@@ -247,7 +247,7 @@
     // 在某一课里时，按钮直接显示"第五课"，一眼知道自己在哪
     const trig = $('#btn-lessons');
     if (trig) {
-      $('.lbl', trig).textContent = L ? `第${CN_NUM[L.no] || L.no}课` : '课程';
+      $('.lbl', trig).textContent = L ? `第${CN_NUM[L.no] || L.no}课` : '教会核心课程';
       trig.classList.toggle('is-current', !!L);
     }
     closeNavPanels();
