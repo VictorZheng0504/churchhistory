@@ -180,6 +180,13 @@ test('世界史视角 data/world-XX.js', () => {
     assert.ok(!seen.has(w.lesson), `同一课有两篇世界史: ${w.lesson}`);
     seen.add(w.lesson);
     for (const k of ['title', 'summary']) assert.ok(w[k], `${w.lesson} 缺 ${k}`);
+    assert.ok(Array.isArray(w.keyPoints) && w.keyPoints.length, `${w.lesson} 缺 keyPoints`);
+    assert.ok(Array.isArray(w.chapters) && w.chapters.length, `${w.lesson} 缺叙述 chapters`);
+    for (const c of w.chapters) assert.ok(c.id && c.title && Array.isArray(c.body) && c.body.length, `${w.lesson} 叙述章节格式错: ${c.id}`);
+    // 叙述篇幅约为本课正文的 1/3：太短讲不清，太长就喧宾夺主
+    const len = cs => cs.reduce((n, c) => n + c.body.join('').length, 0);
+    const ratio = len(w.chapters) / len(L.chapters);
+    assert.ok(ratio >= 0.2 && ratio <= 0.5, `${w.lesson} 叙述篇幅是本课的 ${ratio.toFixed(2)}，应在 0.2–0.5 之间`);
     assert.ok(Array.isArray(w.world) && w.world.length, `${w.lesson} 缺同时期大事`);
     for (const e of w.world) assert.ok(Number.isInteger(e.year) && e.region && e.text, `${w.lesson} 同时期大事格式错: ${e.text}`);
     assert.ok(Array.isArray(w.views) && w.views.length >= 2, `${w.lesson} 至少两种讲法`);

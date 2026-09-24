@@ -579,3 +579,4 @@ code { font-size: .9em; background: var(--paper-2); padding: 0 .3em; border-radi
 .world-link:hover { border-style: solid; }
 .world-link strong { display: block; font-size: var(--fs-3); margin: .2rem 0; }
 .world-link span:last-child { font-family: var(--f-sans); font-size: var(--fs-1); color: var(--accent); }
+.world-story .chapter + .chapter { margin-top: 3rem; }

@@ -85,6 +85,7 @@ await run('世界史视角', 1280, async page => {
   for (const id of WIDS) {
     await page.goto(URL0 + '#world/' + id);
     await page.waitForSelector('.world-views');
+    if (!(await page.$('.world-story .chapter'))) throw new Error(`${id}: 没有叙述章节`);
     if ((await page.$$('.world-view')).length < 2) throw new Error(`${id}: 讲法少于两种`);
     if (!(await page.$('.world-contrast'))) throw new Error(`${id}: 没有对照框`);
     await shot(page, 'world-' + id + '-full', true);

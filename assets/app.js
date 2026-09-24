@@ -386,6 +386,17 @@
         <div class="btn-row" style="margin-top:1.25rem"><a class="btn ghost" href="#${esc(L.id)}">← 回到第 ${L.no} 课：${esc(L.title)}</a><a class="btn ghost" href="#world">全部篇目</a></div>
       </header>
       <aside class="hl note world-disclaimer"><span class="tag">说明</span>这一页转述世俗史学的讲法，不代表本课程立场；与本课的异同放在最后的「对照」框里。</aside>
+      <section class="keypoints"><h2>带走什么</h2><ol>${W.keyPoints.map(k => `<li>${esc(k)}</li>`).join('')}</ol></section>
+
+      <section class="block world-story">
+        <div class="block-head"><h2>世界史怎么讲</h2><span class="aside">按世界通史的叙述，约为本课篇幅的三分之一</span></div>
+        ${W.chapters.map((c, i) => `<article class="chapter" id="wch-${esc(c.id)}">
+          <div class="ch-meta"><span class="lat">${['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII'][i] || i + 1}</span>${c.years ? `<span>${esc(c.years)}</span>` : ''}</div>
+          <h2>${esc(c.title)}</h2>
+          <div class="body">${c.body.map(t => `<p>${esc(t)}</p>`).join('')}</div>
+          ${c.highlight ? `<aside class="hl ${esc(c.highlight.type || 'note')}">${c.highlight.type === 'quote' ? '' : `<span class="tag">${c.highlight.type === 'fact' ? '史实' : '批注'}</span>`}${esc(c.highlight.text)}${c.highlight.source ? `<cite>—— ${esc(c.highlight.source)}</cite>` : ''}</aside>` : ''}
+        </article>`).join('')}
+      </section>
 
       <section class="block">
         <div class="block-head"><h2>同一时期的世界</h2><span class="aside">${W.years ? `${W.years[0]}–${W.years[1]} 前后` : ''}</span></div>
@@ -393,7 +404,7 @@
       </section>
 
       <section class="block">
-        <div class="block-head"><h2>两种讲法</h2><span class="aside">并排对照</span></div>
+        <div class="block-head"><h2>两种解读</h2><span class="aside">同样的史实，不同的解释框架</span></div>
         <div class="world-views">
           ${W.views.map(vw => `<article class="world-view">
             <h3>${esc(vw.label)}</h3>
