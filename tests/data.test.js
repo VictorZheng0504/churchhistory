@@ -183,6 +183,8 @@ test('世界史视角 data/world-XX.js', () => {
     assert.ok(Array.isArray(w.keyPoints) && w.keyPoints.length, `${w.lesson} 缺 keyPoints`);
     assert.ok(Array.isArray(w.chapters) && w.chapters.length, `${w.lesson} 缺叙述 chapters`);
     for (const c of w.chapters) assert.ok(c.id && c.title && Array.isArray(c.body) && c.body.length, `${w.lesson} 叙述章节格式错: ${c.id}`);
+    // 首段首字会被 CSS 做成下沉大字，数字开头（"1517 年…"）会只把一个数字放大，很难看
+    for (const c of w.chapters) assert.ok(!/^[0-9]/.test(c.body[0]), `${w.lesson}/${c.id} 首段不要以数字开头`);
     // 叙述篇幅约为本课正文的 1/3：太短讲不清，太长就喧宾夺主
     const len = cs => cs.reduce((n, c) => n + c.body.join('').length, 0);
     const ratio = len(w.chapters) / len(L.chapters);
