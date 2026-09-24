@@ -190,8 +190,7 @@
         </nav>
       </div>
       <div class="readbar" id="readbar"></div>`;
-    $$('#topbar .nav-trigger').forEach(btn => btn.onclick = e => {
-      e.stopPropagation();
+    $$('#topbar .nav-trigger').forEach(btn => btn.onclick = () => {
       const open = btn.getAttribute('aria-expanded') !== 'true';
       closeNavPanels();
       if (!open) return;
@@ -221,7 +220,8 @@
     });
   }
   function fillLessonPanel() {
-    const cur = decodeURIComponent(location.hash.slice(1)).replace(/^world\//, '');
+    // 世界史页面不算"在某一课"，和按钮文字保持一致
+    const cur = decodeURIComponent(location.hash.slice(1));
     // ✓ 只在三项（章节、互动、测验）都完成时出现，和首页书架的 100% 口径一致
     $('#panel-lessons').innerHTML = LESSONS.map(L => {
       const done = Util.lessonProgress(L, progress.of(L.id)) >= 1;
