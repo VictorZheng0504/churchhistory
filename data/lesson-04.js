@@ -297,7 +297,7 @@
     { id: 'e570', year: 570, title: '穆罕默德出生', desc: '伊斯兰教的创始人生于麦加。', place: 'mecca' },
     { id: 'e630', year: 630, title: '穆罕默德征服麦加', desc: '他从麦地那率大军回到麦加，此后伊斯兰势力迅速扩张。', place: 'mecca' },
     { id: 'e800', year: 800, title: '查理曼加冕', desc: '教皇利奥三世在罗马为法兰克国王查理加冕为罗马皇帝，欧洲身份开始形成。', place: 'rome' },
-    { id: 'e1054', year: 1054, title: '东西方大分裂', desc: '为“和子”之争，君士坦丁堡牧首与教皇利奥九世互相开除教籍，形成罗马天主教与东正教。', place: 'constantinople' }
+    { id: 'e1054', year: 1054, title: '东西方大分裂', desc: '为“和子”之争，君士坦丁堡牧首与教皇利奥九世互相开除教籍，形成罗马天主教与东正教。', place: 'constantinople', milestone: true }
   ],
 
   terms: [

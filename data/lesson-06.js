@@ -271,7 +271,7 @@
     { id: 'luther-born', year: 1483, title: '路德出生', desc: '11 月 10 日生于德意志。' },
     { id: 'monastery', year: 1505, title: '雷雨中许愿，进入修道院', desc: '22 岁的路德被闪电击倒，向圣安妮许愿做修士，随后进入奥古斯丁修道院。' },
     { id: 'greek-nt', year: 1516, title: '伊拉斯谟出版希腊文新约', desc: '"回到本源"的成果；后来的版本成为路德翻译德文圣经的底本。' },
-    { id: 'theses', year: 1517, title: '《九十五条论纲》', desc: '10 月 31 日，路德把论纲钉在维滕堡城堡教堂门上，质疑赎罪券。', place: 'wittenberg' },
+    { id: 'theses', year: 1517, title: '《九十五条论纲》', desc: '10 月 31 日，路德把论纲钉在维滕堡城堡教堂门上，质疑赎罪券。', place: 'wittenberg', milestone: true },
     { id: 'augsburg-1518', year: 1518, title: '奥格斯堡受审', desc: '路德被传到奥格斯堡帝国会议，拒绝撤回，宣称教皇和大公会议都可能犯错。', place: 'augsburg' },
     { id: 'captivity', year: 1520, title: '《教会被掳于巴比伦》与焚烧谕令', desc: '路德只承认洗礼和圣餐两个圣礼；教皇谕令限他 60 天屈服，期满之日他当众烧了谕令。', place: 'wittenberg' },
     { id: 'diet-worms', year: 1521, title: '沃尔姆斯帝国会议', desc: '4 月 17 日起受审，路德说"我的良心受神话语的约束"，拒绝撤回。', place: 'worms' },

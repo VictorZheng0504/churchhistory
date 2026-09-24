@@ -115,6 +115,7 @@
   const LESSONS = (root.COURSE_LESSONS || []).slice().sort((a, b) => a.no - b.no);
   const MAP = root.MAP_DATA;
   const byId = id => LESSONS.find(L => L.id === id);
+  const OVERVIEW = root.COURSE_OVERVIEW || null;
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const el = html => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
@@ -140,6 +141,7 @@
       <div class="topbar-in">
         <a class="brand" href="#"><span class="lat">H</span> <span class="full">${SITE}</span></a>
         <nav class="nav" aria-label="课程导航">
+          ${OVERVIEW ? '<a href="#overview" data-route="overview">导论</a>' : ''}
           ${LESSONS.map(L => `<a href="#${esc(L.id)}" data-route="${esc(L.id)}">第${CN_NUM[L.no] || L.no}课</a>`).join('')}
           <a href="#review" data-route="review">复习</a>
           <button type="button" id="btn-projector" title="放大字号，适合投影">投影</button>
@@ -176,6 +178,7 @@
     main.innerHTML = '';
     if (byId(id)) { renderLesson(main, byId(id)); store.set('last', id); document.title = byId(id).title + ' · ' + SITE; }
     else if (id === 'review') { renderReview(main); document.title = '复习 · ' + SITE; }
+    else if (id === 'overview' && OVERVIEW) { renderOverview(main); document.title = OVERVIEW.title + ' · ' + SITE; }
     else { renderHome(main); document.title = SITE; }
     markNav(id);
     window.scrollTo(0, 0);
@@ -186,6 +189,7 @@
     const count = k => LESSONS.reduce((n, L) => n + (L[k] || []).length, 0);
     const last = byId(store.get('last', ''));
     const first = LESSONS[0];
+    const shelfN = LESSONS.length + (OVERVIEW ? 1 : 0);
     const v = el(`<div class="view">
       <header class="hero">
         <div>
@@ -194,6 +198,7 @@
           <p class="lede">从耶路撒冷的逼迫，到尼西亚的信经；从东西方的分裂，到维滕堡的一扇门、清教徒的新英格兰。跟着殉道者、教父、改教家和清教徒，走一遍神在历史中保守、复兴祂教会的路。</p>
           <div class="btn-row">
             ${last ? `<a class="btn" href="#${esc(last.id)}">继续：第 ${last.no} 课 ${esc(last.title)}</a>` : `<a class="btn" href="#${esc(first.id)}">从第 ${first.no} 课开始</a>`}
+            ${OVERVIEW ? `<a class="btn ghost" href="#overview">先看${esc(OVERVIEW.title)}</a>` : ''}
             <a class="btn ghost" href="#review">复习与测验</a>
           </div>
         </div>
@@ -211,7 +216,15 @@
 
       <section class="block">
         <div class="block-head"><h2>${CN_NUM[LESSONS.length] || LESSONS.length}卷书</h2><span class="aside">点一本书开始；进度保存在本机浏览器</span></div>
-        <div class="shelf" style="--n:${LESSONS.length <= 5 ? LESSONS.length : Math.ceil(LESSONS.length / 2)}">
+        <div class="shelf" style="--n:${shelfN <= 5 ? shelfN : Math.ceil(shelfN / 2)}">
+          ${OVERVIEW ? `<a class="book intro" href="#overview">
+              <span class="band t"></span>
+              <span class="no">序</span>
+              <h3>导论：${esc(OVERVIEW.title)}</h3>
+              <span class="sub">${esc(OVERVIEW.subtitle || '')}</span>
+              <span class="yrs">${LESSONS[0].years[0]}–${LESSONS[LESSONS.length - 1].years[1]}</span>
+              <span class="band b"></span>
+            </a>` : ''}
           ${LESSONS.map(L => {
             const pct = Math.round(Util.lessonProgress(L, progress.of(L.id)) * 100);
             return `<a class="book" href="#${esc(L.id)}" style="${accentStyle(L)}">
@@ -260,6 +273,65 @@
     $$('.tool[data-tab]', v).forEach(a => a.addEventListener('click', () => store.set('reviewTab', a.dataset.tab)));
     $('#home-tl', v).appendChild(timelineView(LESSONS, { filter: true }));
     $('#home-map', v).appendChild(homeMap(LESSONS));
+  }
+
+  /* ================= 导论：两千年一览 ================= */
+  // 每课取标了 milestone 的事件；数据测试保证每课恰好一件
+  function renderOverview(main) {
+    const O = OVERVIEW;
+    const ms = L => L.events.find(e => e.milestone);
+    const t0 = 0, t1 = 2000;
+    const pct = y => ((Math.min(Math.max(y, t0), t1) - t0) / (t1 - t0) * 100).toFixed(2) + '%';
+    const ticks = [];
+    for (let y = t0; y <= t1; y += 250) ticks.push(y);
+    const lessonOf = no => LESSONS.find(L => L.no === no);
+    const v = el(`<div class="view overview">
+      <header class="ov-head">
+        <p class="eyebrow">导论</p>
+        <h1>${esc(O.title)}</h1>
+        ${O.subtitle ? `<p class="ov-sub">${esc(O.subtitle)}</p>` : ''}
+        <p class="lede">${esc(O.lede || '')}</p>
+      </header>
+
+      <section class="block">
+        <div class="block-head"><h2>按真实比例</h2><span class="aside">色条是每课覆盖的年代，圆点是代表事件；点一行进入那一课</span></div>
+        <div class="gantt" role="list">
+          <div class="g-axis" aria-hidden="true"><span class="g-lab"></span><span class="g-track">${ticks.map(y => `<i style="left:${pct(y)}">${y}</i>`).join('')}</span></div>
+          ${LESSONS.map(L => {
+            const e = ms(L);
+            return `<a class="g-row" role="listitem" href="#${esc(L.id)}" style="${accentStyle(L)}" title="${esc(L.title)}">
+              <span class="g-lab"><b>${L.no}</b> ${esc(L.title)}</span>
+              <span class="g-track">
+                <span class="g-bar" style="left:${pct(L.years[0])};width:calc(${pct(L.years[1])} - ${pct(L.years[0])})"></span>
+                ${e ? `<span class="g-dot" style="left:${pct(e.year)}" title="${e.year} ${esc(e.title)}"></span>` : ''}
+              </span>
+            </a>`;
+          }).join('')}
+        </div>
+      </section>
+
+      ${(O.eras || []).map(era => `<section class="block ov-era">
+        <div class="block-head"><h2>${esc(era.name)}</h2><span class="aside lat">${esc(era.years || '')}</span></div>
+        ${era.note ? `<p class="ov-note">${esc(era.note)}</p>` : ''}
+        <ol class="ov-list">
+          ${era.lessons.map(lessonOf).filter(Boolean).map(L => {
+            const e = ms(L);
+            return `<li style="${accentStyle(L)}">
+              <span class="ov-year">${e ? e.year : ''}</span>
+              <div>
+                <p class="ov-lesson">第 ${L.no} 课 · ${esc(L.title)}</p>
+                <h3>${esc(e ? e.title : L.subtitle || '')}</h3>
+                ${e && e.desc ? `<p>${esc(e.desc)}</p>` : ''}
+                <a class="ov-go" href="#${esc(L.id)}">进入第 ${L.no} 课 →</a>
+              </div>
+            </li>`;
+          }).join('')}
+        </ol>
+      </section>`).join('')}
+
+      <div class="btn-row ov-next"><a class="btn" href="#${esc(LESSONS[0].id)}">从第 ${LESSONS[0].no} 课开始</a><a class="btn ghost" href="#">回首页</a></div>
+    </div>`);
+    main.appendChild(v);
   }
 
   /* ---------- 时间轴 ---------- */

@@ -513,3 +513,41 @@ code { font-size: .9em; background: var(--paper-2); padding: 0 .3em; border-radi
 .ch-fig img { display: block; width: 100%; height: auto; }
 .ch-fig figcaption { margin-top: .5rem; font-family: var(--f-sans); font-size: var(--fs-0); color: var(--muted); line-height: 1.6; }
 .ch-fig .credit { display: block; opacity: .8; }
+
+/* 导论：两千年一览 */
+.book.intro { --accent: var(--ink); background: var(--ink); color: var(--paper); }
+.book.intro .band { background: color-mix(in srgb, var(--paper) 35%, transparent); }
+.ov-head { padding-top: clamp(2rem, 6vw, 4rem); max-width: var(--measure); }
+.ov-head h1 { font-size: var(--fs-6); line-height: 1.1; }
+.ov-sub { font-family: var(--f-lat); font-style: italic; color: var(--rubric); font-size: var(--fs-3); margin-top: .3rem; }
+.ov-head .lede { margin-top: 1.1rem; color: var(--ink-2); }
+/* 横向比例图：标签列 + 轨道；位置全部用百分比，手机上自动缩放 */
+.gantt { font-family: var(--f-sans); font-size: var(--fs-0); }
+.g-axis, .g-row { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr); gap: .75rem; align-items: center; }
+.g-row { text-decoration: none; padding: .28rem 0; border-radius: var(--radius); }
+.g-row:hover { background: var(--card); }
+.g-lab { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ink-2); }
+.g-lab b { font-family: var(--f-lat); color: var(--accent); font-size: 1rem; font-weight: 400; display: inline-block; min-width: 1.4em; }
+.g-track { position: relative; height: 14px; }
+.g-row .g-track { background: repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 12.5%); }
+.g-axis .g-track { height: 1.4rem; border-bottom: 1px solid var(--line); }
+.g-axis i { position: absolute; bottom: .15rem; transform: translateX(-50%); font-style: normal; font-family: var(--f-lat); color: var(--muted); }
+.g-axis i:first-child { transform: none; } .g-axis i:last-child { transform: translateX(-100%); }
+.g-bar { position: absolute; top: 3px; height: 8px; min-width: 3px; border-radius: 4px; background: var(--accent); opacity: .45; }
+.g-dot { position: absolute; top: 0; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: var(--accent); border: 2px solid var(--paper); }
+.ov-note { color: var(--ink-2); margin: -.4rem 0 1.2rem; max-width: var(--measure); }
+.ov-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 1.4rem; }
+.ov-list li { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: 1rem; border-left: 3px solid var(--accent); padding-left: 1rem; }
+.ov-year { font-family: var(--f-lat); font-size: 2rem; line-height: 1.1; color: var(--accent); }
+.ov-lesson { font-family: var(--f-sans); font-size: var(--fs-0); color: var(--muted); letter-spacing: .05em; }
+.ov-list h3 { font-size: var(--fs-3); margin: .15rem 0 .35rem; }
+.ov-list p { max-width: var(--measure); }
+.ov-go { display: inline-block; margin-top: .4rem; font-family: var(--f-sans); font-size: var(--fs-0); color: var(--accent); }
+.ov-next { margin-top: 3rem; }
+@media (max-width: 560px) {
+  .g-axis, .g-row { grid-template-columns: 2rem minmax(0, 1fr); gap: .4rem; }
+  .g-lab { font-size: 0; } .g-lab b { font-size: 1rem; }
+  .g-axis i:nth-child(even) { display: none; }
+  .ov-list li { grid-template-columns: 1fr; gap: .2rem; }
+  .ov-year { font-size: 1.6rem; }
+}

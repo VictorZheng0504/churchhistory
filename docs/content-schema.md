@@ -33,7 +33,7 @@
   ],
 
   people: [ { id, name, nameEn, years: '1483–1546', role: '一句话身份', bio: '2–4 句', quote: { text, source } /*可选*/ } ],
-  events: [ { id, year: 1517, title, desc, place: 'wittenberg' /*可选，对应 places.id*/ } ],
+  events: [ { id, year: 1517, title, desc, place: 'wittenberg' /*可选，对应 places.id*/, milestone: true /*可选：导论页的代表事件，每课恰好一个*/ } ],
   places: [ { id, name, nameEn, lat, lon, note } ],
   terms:  [ { term: '因信称义', en: 'Justification by faith', def: '1–2 句解释' } ],  // 也会变成闪卡
   quotes: [ { text, source } ],
@@ -68,3 +68,7 @@
 ## 插图
 
 图片放 `assets/figures/`。扫描件先缩到宽 2000px、JPEG 质量 82（每张约 0.5–0.7 MB），不要直接放原图（十几 MB）。`npm test` 会检查 `src` 指向的文件是否存在。
+
+## 导论页
+
+`data/overview.js` 定义导论「两千年一览」的标题、导语和五个时代（每个时代包含哪几课）。每课的代表事件在该课 `events` 里标 `milestone: true`。`npm test` 检查：每课恰好一个代表事件；时代不重不漏地覆盖所有课；同一时代内代表事件的年份递增。

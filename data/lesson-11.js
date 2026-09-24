@@ -239,7 +239,7 @@
     { id: 'asbury-bishop', year: 1784, title: '美国循道会成立', desc: '“圣诞会议”上阿斯伯里被按立为监督，循道会成为独立的宗派。', place: 'baltimore' },
     { id: 'constitution', year: 1787, title: '美国宪法', desc: '确立分权与制衡；正文没有提到神。', place: 'philadelphia' },
     { id: 'on-religion', year: 1799, title: '施莱尔马赫《论宗教》', desc: '向“有教养的蔑视宗教者”论宗教，把信仰的本质放在感情上。', place: 'berlin' },
-    { id: 'cane-ridge', year: 1801, title: '坎恩岭营地聚会', desc: '多达两万五千人聚集数日听道，第二次大觉醒的标志性事件。', place: 'cane-ridge' },
+    { id: 'cane-ridge', year: 1801, title: '坎恩岭营地聚会', desc: '多达两万五千人聚集数日听道，第二次大觉醒的标志性事件。', place: 'cane-ridge', milestone: true },
     { id: 'seminary', year: 1812, title: '普林斯顿神学院成立', desc: '亚历山大任第一位教授；贺智后来在此执教半个多世纪。', place: 'princeton' },
     { id: 'jefferson-bible', year: 1820, title: '“杰斐逊圣经”', desc: '杰斐逊剪贴福音书，删去神迹和复活，只留下道德教训。', place: 'monticello' },
     { id: 'finney-converted', year: 1821, title: '芬尼归信', desc: '纽约州亚当斯镇的年轻律师在林中祷告后归信，开始讲道。', place: 'adams-ny' },

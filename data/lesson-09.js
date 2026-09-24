@@ -207,7 +207,7 @@
     { id: 'kjv', year: 1611, title: '钦定本圣经出版', desc: '英王钦定本问世，成为此后几百年英语世界最通行的圣经。', place: 'london' },
     { id: 'leiden', year: 1609, title: '分离派会众定居莱顿', desc: '约 1608 年逃往荷兰的分离派，次年定居莱顿，日后成为天路客。', place: 'leiden' },
     { id: 'mayflower', year: 1620, title: '五月花号抵达普利茅斯', desc: '天路客（分离派）横渡大西洋，建立普利茅斯殖民地。', place: 'plymouth-ma' },
-    { id: 'arbella', year: 1630, title: '阿贝拉号与“山上之城”', desc: '温斯罗普率清教徒前往马萨诸塞湾，大迁徙开始。', place: 'boston-ma' },
+    { id: 'arbella', year: 1630, title: '阿贝拉号与“山上之城”', desc: '温斯罗普率清教徒前往马萨诸塞湾，大迁徙开始。', place: 'boston-ma', milestone: true },
     { id: 'laud-archbishop', year: 1633, title: '劳德任坎特伯雷大主教', desc: '对清教徒的打压加剧，更多人出走新英格兰。', place: 'london' },
     { id: 'harvard', year: 1636, title: '哈佛创立；胡克建立哈特福德', desc: '新英格兰为培养牧师创办哈佛学院；同年胡克带领会众建立哈特福德。', place: 'hartford' },
     { id: 'new-haven', year: 1638, title: '达文波特建立纽黑文', desc: '又一个按圣经原则治理的清教徒殖民地。', place: 'new-haven' },

@@ -236,7 +236,7 @@
     { id: 'georgia', year: 1738, title: '怀特腓到佐治亚', desc: '首次来到美洲，在佐治亚建立孤儿院。', place: 'savannah' },
     { id: 'philadelphia', year: 1739, title: '怀特腓在费城和南方讲道', desc: '再度渡海，在宾夕法尼亚和南方殖民地讲道，结识富兰克林。', place: 'philadelphia' },
     { id: 'visit', year: 1740, title: '怀特腓访问北安普敦', desc: '10 月住在爱德华兹家；1740–1741 年的新英格兰巡回是大觉醒的高峰。', place: 'northampton-ma' },
-    { id: 'enfield', year: 1741, title: '《落在愤怒之神手中的罪人》', desc: '爱德华兹在恩菲尔德讲道；同年在耶鲁演讲《圣灵工作的辨别标记》。', place: 'enfield' },
+    { id: 'enfield', year: 1741, title: '《落在愤怒之神手中的罪人》', desc: '爱德华兹在恩菲尔德讲道；同年在耶鲁演讲《圣灵工作的辨别标记》。', place: 'enfield', milestone: true },
     { id: 'dismissed', year: 1750, title: '爱德华兹被辞退', desc: '6 月 22 日，北安普敦会众因圣餐之争投票解除他的牧职。', place: 'northampton-ma' },
     { id: 'stockbridge', year: 1751, title: '到斯托克布里奇宣教', desc: '牧养印第安人宣教教会，写下《意志的自由》等名著。', place: 'stockbridge' },
     { id: 'princeton', year: 1758, title: '就任普林斯顿校长后去世', desc: '2 月 16 日就任新泽西学院校长，接种天花失败，3 月 22 日去世。', place: 'princeton' },
