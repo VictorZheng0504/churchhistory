@@ -537,6 +537,15 @@ footer.site { max-width: 72rem; margin: 0 auto; padding: 2rem 16px 3rem; font-fa
   .map-inset { width: 42%; }
   .map-pt text { font-size: 22px; }
 }
+/* "教会核心课程"比原来的"课程"宽，360px 级手机上再收一点间距，保证不换行、不溢出 */
+@media (max-width: 400px) {
+  .topbar-in { gap: .4rem; }
+  .nav { gap: 0; }
+  .nav > a, .nav-trigger { padding-inline: .45rem; }
+  #btn-more { padding-inline: .5rem; }
+  html.projector .nav { font-size: .6rem; }
+  html.projector .nav > a, html.projector .nav-trigger { padding-inline: .35rem; }
+}
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
