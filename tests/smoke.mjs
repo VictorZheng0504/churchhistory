@@ -129,6 +129,15 @@ await run('手机宽度无横向滚动', 390, async page => {
     const over = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     if (over > 1) throw new Error(`${h || '首页'} 页面横向溢出 ${over}px`);
   }
+  // 投影模式放大根字号，rem 写死的最小宽度最容易在这里撑破页面
+  await page.evaluate(() => localStorage.setItem('ch:projector', 'true'));
+  for (const h of ['', '#overview', ...IDS.map(id => '#' + id), '#review', '#world', '#world/luther']) {
+    await page.goto(URL0 + h);
+    await page.waitForTimeout(200);
+    const over = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    if (over > 1) throw new Error(`投影模式 ${h || '首页'} 页面横向溢出 ${over}px`);
+  }
+  await page.evaluate(() => localStorage.removeItem('ch:projector'));
   // 时间长河：窄屏上同一行的段不能互相压住
   await page.goto(URL0 + '#world');
   await page.waitForSelector('.wx-seg');
