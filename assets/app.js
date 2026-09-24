@@ -116,6 +116,9 @@
   const MAP = root.MAP_DATA;
   const byId = id => LESSONS.find(L => L.id === id);
   const OVERVIEW = root.COURSE_OVERVIEW || null;
+  // 世界史视角：辅助板块，每篇对应一课（data/world-XX.js）
+  const WORLD = root.COURSE_WORLD || [];
+  const worldOf = L => WORLD.find(w => w.lesson === L.id);
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const el = html => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
@@ -144,6 +147,7 @@
           ${OVERVIEW ? '<a href="#overview" data-route="overview">导论</a>' : ''}
           ${LESSONS.map(L => `<a href="#${esc(L.id)}" data-route="${esc(L.id)}">第${CN_NUM[L.no] || L.no}课</a>`).join('')}
           <a href="#review" data-route="review">复习</a>
+          ${WORLD.length ? '<a href="#world" data-route="world">世界史</a>' : ''}
           <button type="button" id="btn-projector" title="放大字号，适合投影">投影</button>
           <button type="button" id="btn-theme" title="切换深浅色">◐</button>
         </nav>
@@ -161,8 +165,9 @@
     };
   }
   function markNav(route) {
+    const navKey = route.startsWith('world/') ? 'world' : route;
     $$('#topbar [data-route]').forEach(a => {
-      if (a.dataset.route === route) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+      if (a.dataset.route === navKey) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
     });
     const L = byId(route);
     document.body.setAttribute('style', L ? accentStyle(L) : '');
@@ -179,6 +184,11 @@
     if (byId(id)) { renderLesson(main, byId(id)); store.set('last', id); document.title = byId(id).title + ' · ' + SITE; }
     else if (id === 'review') { renderReview(main); document.title = '复习 · ' + SITE; }
     else if (id === 'overview' && OVERVIEW) { renderOverview(main); document.title = OVERVIEW.title + ' · ' + SITE; }
+    else if (id === 'world' && WORLD.length) { renderWorldIndex(main); document.title = '世界史视角 · ' + SITE; }
+    else if (id.startsWith('world/') && byId(id.slice(6)) && worldOf(byId(id.slice(6)))) {
+      const L = byId(id.slice(6));
+      renderWorld(main, L, worldOf(L)); document.title = worldOf(L).title + ' · ' + SITE;
+    }
     else { renderHome(main); document.title = SITE; }
     markNav(id);
     window.scrollTo(0, 0);
@@ -257,6 +267,7 @@
           <a class="tool" href="#review" data-tab="order"><h3>时间线挑战</h3><p>随机抽 6 件大事，排出先后。</p></a>
           <a class="tool" href="#review" data-tab="who"><h3>我是谁？</h3><p>读简介，猜人物。</p></a>
           <a class="tool" href="#review" data-tab="quiz"><h3>混合测验</h3><p>从各课里随机抽 10 题。</p></a>
+          ${WORLD.length ? '<a class="tool" href="#world"><h3>世界史视角</h3><p>对照阅读：世界通史和国内教材怎样讲同一段历史。</p></a>' : ''}
         </div>
       </section>
 
@@ -330,6 +341,87 @@
       </section>`).join('')}
 
       <div class="btn-row ov-next"><a class="btn" href="#${esc(LESSONS[0].id)}">从第 ${LESSONS[0].no} 课开始</a><a class="btn ghost" href="#">回首页</a></div>
+    </div>`);
+    main.appendChild(v);
+  }
+
+  /* ================= 世界史视角（辅助板块） ================= */
+  // 独立于课文：转述世俗史学的讲法，最后用"对照"框和本课比较。正文不做护教式反驳。
+  function renderWorldIndex(main) {
+    const v = el(`<div class="view world">
+      <header class="ov-head">
+        <p class="eyebrow">辅助板块</p>
+        <h1>世界史视角</h1>
+        <p class="ov-sub">世人怎样讲同一段历史</p>
+        <p class="lede">本课程是教会史，从信仰出发讲神怎样保守祂的教会。这个板块换一个角度：世界通史（西方学界主流和国内高校教材）怎样描述、解读同一段历史。每篇对应一课，最后有一个「对照」框，供小组讨论。</p>
+      </header>
+      <aside class="hl note world-disclaimer"><span class="tag">说明</span>这里转述的是世俗史学的观点，不代表本课程立场；教材观点是转述大意，不是原文。</aside>
+      <section class="block">
+        <div class="block-head"><h2>各课对应篇目</h2><span class="aside">已写 ${WORLD.length} / ${LESSONS.length} 篇</span></div>
+        <ol class="ov-list">
+          ${LESSONS.map(L => {
+            const W = worldOf(L);
+            return `<li style="${accentStyle(L)}" class="${W ? '' : 'pending'}">
+              <span class="ov-year">${L.no}</span>
+              <div>
+                <p class="ov-lesson">第 ${L.no} 课 · ${esc(L.title)} · ${L.years[0]}–${L.years[1]}</p>
+                <h3>${W ? esc(W.title) : '撰写中'}</h3>
+                ${W ? `<p>${esc(W.summary)}</p><a class="ov-go" href="#world/${esc(L.id)}">阅读 →</a>` : ''}
+              </div>
+            </li>`;
+          }).join('')}
+        </ol>
+      </section>
+    </div>`);
+    main.appendChild(v);
+  }
+
+  function renderWorld(main, L, W) {
+    const v = el(`<div class="view world" style="${accentStyle(L)}">
+      <header class="ov-head">
+        <p class="eyebrow">世界史视角 · 对应第 ${L.no} 课</p>
+        <h1>${esc(W.title)}</h1>
+        ${W.subtitle ? `<p class="ov-sub">${esc(W.subtitle)}</p>` : ''}
+        <p class="lede">${esc(W.summary)}</p>
+        <div class="btn-row" style="margin-top:1.25rem"><a class="btn ghost" href="#${esc(L.id)}">← 回到第 ${L.no} 课：${esc(L.title)}</a><a class="btn ghost" href="#world">全部篇目</a></div>
+      </header>
+      <aside class="hl note world-disclaimer"><span class="tag">说明</span>这一页转述世俗史学的讲法，不代表本课程立场；与本课的异同放在最后的「对照」框里。</aside>
+
+      <section class="block">
+        <div class="block-head"><h2>同一时期的世界</h2><span class="aside">${W.years ? `${W.years[0]}–${W.years[1]} 前后` : ''}</span></div>
+        <ol class="world-tl">${W.world.map(e => `<li><span class="lat">${e.year}</span><span class="rg">${esc(e.region)}</span><p>${esc(e.text)}</p></li>`).join('')}</ol>
+      </section>
+
+      <section class="block">
+        <div class="block-head"><h2>两种讲法</h2><span class="aside">并排对照</span></div>
+        <div class="world-views">
+          ${W.views.map(vw => `<article class="world-view">
+            <h3>${esc(vw.label)}</h3>
+            <p class="frame">${esc(vw.frame)}</p>
+            ${vw.points.map(pt => `<h4>${esc(pt.title)}</h4><p>${esc(pt.body)}</p>`).join('')}
+            <details class="world-src"><summary>代表著作</summary><ul class="reading">${vw.sources.map(r => `<li><div>${esc(r.title)}</div><div class="au">${esc(r.author || '')}</div>${r.note ? `<div class="nt">${esc(r.note)}</div>` : ''}</li>`).join('')}</ul></details>
+          </article>`).join('')}
+        </div>
+      </section>
+
+      <section class="block">
+        <div class="block-head"><h2>三种讲法一览</h2></div>
+        <div class="cmp-wrap"><table class="cmp world-cmp"><thead><tr><th></th>${W.table.columns.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead>
+          <tbody>${W.table.rows.map(r => `<tr><th scope="row">${esc(r.topic)}</th>${r.cells.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+      </section>
+
+      <section class="block world-contrast">
+        <div class="block-head"><h2>对照</h2><span class="aside">和第 ${L.no} 课放在一起看</span></div>
+        <div class="wc-grid">
+          <div><h3>共识</h3><ul>${W.contrast.agree.map(t => `<li>${esc(t)}</li>`).join('')}</ul></div>
+          <div><h3>分歧</h3><ul>${W.contrast.differ.map(t => `<li>${esc(t)}</li>`).join('')}</ul></div>
+        </div>
+        <h3>讨论</h3>
+        <ol class="discuss">${W.contrast.questions.map(t => `<li>${esc(t)}</li>`).join('')}</ol>
+      </section>
+
+      ${W.terms && W.terms.length ? `<section class="block"><div class="block-head"><h2>关键词</h2></div><dl class="terms">${W.terms.map(t => `<div><dt>${esc(t.term)}<span class="lat">${esc(t.en || '')}</span></dt><dd>${esc(t.def)}</dd></div>`).join('')}</dl></section>` : ''}
+      ${W.notes && W.notes.length ? `<section class="block"><div class="block-head"><h2>待核</h2></div>${W.notes.map(n => `<p class="src-note"><span class="tag">批注</span>${esc(n)}</p>`).join('')}</section>` : ''}
     </div>`);
     main.appendChild(v);
   }
@@ -634,6 +726,9 @@
 
     col.appendChild(el(`<section class="block" id="sec-discuss"><div class="block-head"><h2>小组讨论</h2></div><ol class="discuss">${L.discussion.map(d => `<li>${esc(d)}</li>`).join('')}</ol></section>`));
     if (L.reading && L.reading.length) col.appendChild(el(`<section class="block"><div class="block-head"><h2>延伸阅读</h2></div><ul class="reading">${L.reading.map(r => `<li><div>${esc(r.title)}</div><div class="au">${esc(r.author || '')}</div>${r.note ? `<div class="nt">${esc(r.note)}</div>` : ''}</li>`).join('')}</ul></section>`));
+
+    const W = worldOf(L);
+    if (W) col.appendChild(el(`<section class="block"><a class="world-link" href="#world/${esc(L.id)}"><span class="eyebrow">辅助阅读 · 世界史视角</span><strong>${esc(W.title)}</strong><span>${esc(W.subtitle || '')}：世界通史和国内教材怎样讲这一段 →</span></a></section>`));
 
     const idx = LESSONS.indexOf(L), prev = LESSONS[idx - 1], next = LESSONS[idx + 1];
     col.appendChild(el(`<nav class="lesson-foot">${prev ? `<a href="#${esc(prev.id)}"><span class="dir">← 上一课</span><strong>${esc(prev.title)}</strong></a>` : '<span></span>'}${next ? `<a href="#${esc(next.id)}" style="text-align:right"><span class="dir">下一课 →</span><strong>${esc(next.title)}</strong></a>` : `<a href="#review" style="text-align:right"><span class="dir">全部读完了 →</span><strong>去总复习</strong></a>`}</nav>`));

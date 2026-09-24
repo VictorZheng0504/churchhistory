@@ -551,3 +551,31 @@ code { font-size: .9em; background: var(--paper-2); padding: 0 .3em; border-radi
   .ov-list li { grid-template-columns: 1fr; gap: .2rem; }
   .ov-year { font-size: 1.6rem; }
 }
+
+/* 世界史视角（辅助板块）：比课文更素，用浅色卡片和并排两栏，提示"这是别人的讲法" */
+.world-disclaimer { max-width: var(--measure); margin-top: 1.5rem; }
+.world .ov-list li.pending { opacity: .5; }
+.world-tl { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 1rem 1.5rem; }
+.world-tl li { border-top: 2px solid var(--line); padding-top: .5rem; }
+.world-tl .lat { font-size: 1.5rem; color: var(--accent); margin-right: .5rem; }
+.world-tl .rg { font-family: var(--f-sans); font-size: var(--fs-0); color: var(--muted); letter-spacing: .08em; }
+.world-tl p { font-size: var(--fs-1); color: var(--ink-2); margin-top: .2rem; }
+.world-views { display: grid; grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr)); gap: 1.5rem; }
+.world-view { border: 1px solid var(--line); background: var(--card); border-radius: var(--radius); padding: 1.2rem 1.3rem; }
+.world-view h3 { font-size: var(--fs-3); }
+.world-view .frame { font-family: var(--f-sans); font-size: var(--fs-1); color: var(--muted); margin: .4rem 0 .6rem; padding-bottom: .6rem; border-bottom: 1px dashed var(--line); }
+.world-view h4 { font-size: var(--fs-2); margin-top: 1rem; }
+.world-view h4 + p { font-size: var(--fs-1); color: var(--ink-2); margin-top: .2rem; }
+.world-src { margin-top: 1.2rem; font-family: var(--f-sans); font-size: var(--fs-1); }
+.world-src summary { cursor: pointer; color: var(--accent); }
+.world-cmp td:first-of-type { background: color-mix(in srgb, var(--accent) 7%, transparent); }
+.world-contrast { border: 2px solid var(--accent); border-radius: var(--radius); padding: 1rem 1.3rem 1.3rem; }
+.world-contrast .block-head { border-bottom-color: var(--accent); }
+.world-contrast h3 { font-size: var(--fs-2); color: var(--accent); margin: 1rem 0 .3rem; }
+.wc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 0 2rem; }
+.wc-grid ul { margin: 0; padding-left: 1.2em; font-size: var(--fs-1); color: var(--ink-2); }
+.wc-grid li + li { margin-top: .4rem; }
+.world-link { display: block; text-decoration: none; border: 1px dashed var(--accent); border-radius: var(--radius); padding: 1rem 1.2rem; background: var(--card); max-width: var(--measure); }
+.world-link:hover { border-style: solid; }
+.world-link strong { display: block; font-size: var(--fs-3); margin: .2rem 0; }
+.world-link span:last-child { font-family: var(--f-sans); font-size: var(--fs-1); color: var(--accent); }

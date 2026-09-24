@@ -72,3 +72,23 @@
 ## 导论页
 
 `data/overview.js` 定义导论「两千年一览」的标题、导语和五个时代（每个时代包含哪几课）。每课的代表事件在该课 `events` 里标 `milestone: true`。`npm test` 检查：每课恰好一个代表事件；时代不重不漏地覆盖所有课；同一时代内代表事件的年份递增。
+
+## 世界史视角（辅助板块）
+
+`data/world-XX.js`，XX 为对应课次，写完在 `index.html` 加一行 `<script>`。转述世俗史学的讲法，不代表课程立场；教材观点写转述大意，原文引用要注明出处。
+
+```js
+(window.COURSE_WORLD = window.COURSE_WORLD || []).push({
+  lesson: 'luther',                 // 对应课程 id，每课最多一篇
+  title, subtitle, years: [1483, 1546], summary,
+  world: [ { year: 1517, region: '中东', text: '同一时期欧洲以外的大事' } ],
+  views: [                          // 至少两种讲法，并排显示
+    { id: 'west', label: '西方学界主流', frame: '这种讲法的解释框架', points: [ { title, body } ], sources: [ { title, author, note } ] }
+  ],
+  table: { columns: ['本课（教会史）', '西方学界', '国内教材'], rows: [ { topic: '起因', cells: [ /* 与 columns 等长 */ ] } ] },
+  contrast: { agree: [], differ: [], questions: [] },   // 对照框：共识 / 分歧 / 讨论题
+  terms: [ { term, en, def } ],     // 可选
+  notes: ['待核事项'],              // 可选
+  meta: {}
+});
+```

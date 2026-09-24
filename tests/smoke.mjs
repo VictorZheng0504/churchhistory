@@ -74,6 +74,26 @@ await run('导论', 1280, async page => {
   await shot(page, 'overview-full', true);
 });
 
+const WIDS = [...fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8').matchAll(/src="(data\/world-\d+\.js)"/g)].map(m => {
+  const sb = { window: {} }; vm.createContext(sb); vm.runInContext(fs.readFileSync(path.join(ROOT, m[1]), 'utf8'), sb);
+  return sb.window.COURSE_WORLD[0].lesson;
+});
+await run('世界史视角', 1280, async page => {
+  await page.goto(URL0 + '#world');
+  await page.waitForSelector('.world .ov-list');
+  if ((await page.$$('.world .ov-list li')).length !== IDS.length) throw new Error('目录不是每课一行');
+  for (const id of WIDS) {
+    await page.goto(URL0 + '#world/' + id);
+    await page.waitForSelector('.world-views');
+    if ((await page.$$('.world-view')).length < 2) throw new Error(`${id}: 讲法少于两种`);
+    if (!(await page.$('.world-contrast'))) throw new Error(`${id}: 没有对照框`);
+    await shot(page, 'world-' + id + '-full', true);
+    // 课程页上有入口
+    await page.goto(URL0 + '#' + id);
+    await page.waitForSelector(`.world-link[href="#world/${id}"]`);
+  }
+});
+
 await run('复习页', 1280, async page => {
   await page.goto(URL0 + '#review');
   for (const tab of ['flash', 'order', 'who', 'quiz']) {
@@ -87,7 +107,7 @@ await run('复习页', 1280, async page => {
 });
 
 await run('手机宽度无横向滚动', 390, async page => {
-  for (const h of ['', '#overview', '#luther', '#puritans', '#review']) {
+  for (const h of ['', '#overview', '#luther', '#puritans', '#review', '#world', '#world/luther']) {
     await page.goto(URL0 + h);
     await page.waitForTimeout(300);
     const over = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
